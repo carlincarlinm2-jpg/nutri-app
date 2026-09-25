@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3f5f4">
-<meta name="nutri-version" content="22">
+<meta name="nutri-version" content="23">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -301,10 +301,108 @@ header .brand .logo-word{font-size:24px}
 .ex-row.is-done .row-title{color:var(--muted);text-decoration:line-through}
 .ex-row.is-done .row-icon{background:var(--mint);color:var(--brand-d)}
 .page-mascot{flex:0 0 auto}
+/* ===== Mascota: saluda y guiña ===== */
+.mascot-svg .ms-hand,.mascot-svg .ms-wink{opacity:0}
+.mascot-svg .ms-hand{transform-box:view-box;transform-origin:160px 100px}
+.mascot-svg.mood-wave .ms-body{animation:msFloat 3s ease-in-out infinite}
+.mascot-svg.mood-wave .ms-shadow{animation:msShadow 3s ease-in-out infinite}
+.mascot-svg.mood-wave .ms-hand{opacity:1;animation:msWave 1.2s ease-in-out infinite}
+.mascot-svg.mood-wave .ms-blush{opacity:.55}
+.mascot-svg.mood-wave .ms-eye:nth-child(2){animation:msWinkEye 3.2s infinite}
+.mascot-svg.mood-wave .ms-wink{animation:msWinkArc 3.2s infinite}
+.mascot-svg.mood-wave .ms-smile{opacity:0}.mascot-svg.mood-wave .ms-open{opacity:1}
+@keyframes msWave{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(22deg)}}
+@keyframes msWinkEye{0%,55%,75%,100%{opacity:1}58%,72%{opacity:0}}
+@keyframes msWinkArc{0%,55%,75%,100%{opacity:0}58%,72%{opacity:1}}
+.logo-word{color:var(--ink,#0b2e20)}
+
+/* ===== Pantalla de saludo ===== */
+.greet{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;animation:greetIn .45s ease-out;background:linear-gradient(180deg,#e9f8ff 0,#f3fbf6 55%,#f3f5f4 100%)}
+.greet.out{opacity:0;transform:scale(1.03);transition:opacity .35s,transform .35s}
+@keyframes greetIn{from{opacity:0}to{opacity:1}}
+.greet-body{position:relative;text-align:center;padding:0 28px;max-width:440px}
+.greet-mascot{display:flex;justify-content:center;animation:greetPop .7s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes greetPop{from{transform:translateY(40px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+.greet h1{font-size:32px;margin:14px 0 8px;letter-spacing:-.03em;color:#0c1a14;animation:greetUp .5s .2s both}
+.greet p{font-size:16px;color:#4a5a52;margin:0 0 26px;line-height:1.45;animation:greetUp .5s .3s both}
+.greet-btn{animation:greetUp .5s .4s both;max-width:280px;margin:0 auto}
+@keyframes greetUp{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.greet-sky{position:absolute;inset:0;pointer-events:none}
+.sky-sun{position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,#ffe58a 0,#ffd24d 35%,rgba(255,210,77,0) 70%);animation:sunGlow 4s ease-in-out infinite}
+@keyframes sunGlow{50%{transform:scale(1.08)}}
+.greet-sunset{background:linear-gradient(180deg,#ffb77a 0,#ffd6b0 38%,#fff1e4 70%,#fbf1e8 100%)}
+.greet-sunset h1{color:#3b1d0e}.greet-sunset p{color:#7a4a2e}
+.sky-dusk{position:absolute;left:50%;top:18%;width:300px;height:300px;margin-left:-150px;border-radius:50%;background:radial-gradient(circle,#ff9a4d 0,#ff8a5c 30%,rgba(255,138,92,0) 70%);opacity:.75;animation:sunGlow 5s ease-in-out infinite}
+.greet-night{background:radial-gradient(120% 70% at 50% 0,#1d3a55 0,#0f1d2b 45%,#0b1411 100%)}
+.greet-night h1{color:#f1f7f4}.greet-night p{color:#a9bdb3}
+.greet-night .greet-btn{background:#34d399;color:#062016}
+.sky-moon{position:absolute;top:60px;right:44px;width:70px;height:70px;border-radius:50%;box-shadow:-16px 10px 0 0 #f5f0c8;transform:rotate(-20deg);filter:drop-shadow(0 0 18px rgba(245,240,200,.45))}
+.star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;animation:twinkle 2.2s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}
+
+/* ===== Tarde (atardecer) ===== */
+html[data-time="sunset"]{--bg:#fcebdc;--card:#fff8f1;--line:#f3dcc8;--mint:#ffe6cf;--brand-d:#c2410c}
+html[data-time="sunset"] body{background:linear-gradient(180deg,#ffc58f 0,#ffd9b5 180px,#fcebdc 460px) fixed}
+html[data-time="sunset"] .qa-ic{background:#fff8f1}
+html[data-time="sunset"] .streak-card{background:linear-gradient(135deg,#ffe0bf,#fff8f1 70%)}
+html[data-time="sunset"] .row-icon{background:#fdeee0}
+html[data-time="sunset"] .sheet,html[data-time="sunset"] .streak-modal{background:#fff8f1}
+html[data-time="sunset"] .res-group,html[data-time="sunset"] .group,html[data-time="sunset"] .stat,html[data-time="sunset"] .search-box,html[data-time="sunset"] .seg,html[data-time="sunset"] .chip{background:#fcebdc}
+html[data-time="sunset"] .spark-wrap{color:#ea580c}
+html[data-time="sunset"] .app{background:transparent}
+html[data-time="sunset"] header{background:rgba(255,236,217,.82)}
+html[data-time="sunset"] .hero,html[data-time="sunset"] .profile-hero{background:radial-gradient(120% 90% at 100% 0,#ffc999 0,rgba(255,201,153,0) 60%),radial-gradient(90% 80% at 0 100%,#ffd1d6 0,rgba(255,209,214,0) 60%),#fff3e6;box-shadow:0 1px 2px rgba(60,30,10,.04),0 18px 40px -24px rgba(214,110,40,.4)}
+html[data-time="sunset"] .bottom{background:rgba(255,249,243,.9)}
+html[data-time="sunset"] .scan-hero{background:radial-gradient(90% 90% at 50% 0,#ffe0c2,rgba(255,224,194,0) 70%),#fff8f2}
+
+/* ===== Noche (modo oscuro) ===== */
+html[data-time="night"]{--bg:#0d1411;--card:#161f1b;--ink:#eef5f1;--ink2:#c5d2cb;--muted:#8b9c94;--line:#25322c;--mint:#153528;color-scheme:dark}
+html[data-time="night"] body{background:linear-gradient(180deg,#112a22 0,#0d1411 340px) fixed;color:var(--ink)}
+html[data-time="night"] .app{background:transparent}
+html[data-time="night"] header{background:rgba(13,20,17,.8)}
+html[data-time="night"] .backbtn,html[data-time="night"] .avatar-btn{background:#1d2823;color:var(--ink)}
+html[data-time="night"] .hero,html[data-time="night"] .profile-hero{background:radial-gradient(120% 90% at 100% 0,rgba(52,211,153,.22) 0,rgba(52,211,153,0) 60%),radial-gradient(90% 80% at 0 100%,rgba(79,124,255,.18) 0,rgba(79,124,255,0) 60%),var(--card);box-shadow:none}
+html[data-time="night"] .macro-bar{background:#243029}
+html[data-time="night"] .qa-ic{background:var(--card);color:var(--ink);box-shadow:none}
+html[data-time="night"] .qa:first-child .qa-ic{background:#34d399;color:#062016}
+html[data-time="night"] .card{box-shadow:none}
+html[data-time="night"] .row-icon,html[data-time="night"] .food-row .del,html[data-time="night"] .icon-btn,html[data-time="night"] .sheetclose,html[data-time="night"] .smallbtn,html[data-time="night"] .calhead button,html[data-time="night"] .mic-btn{background:#1f2b26!important;color:var(--ink2)!important}
+html[data-time="night"] .row-icon.sun{background:#3a2e12!important;color:#fbbf24!important}
+html[data-time="night"] .row-icon.utensils{background:#153528!important;color:#6ee7b7!important}
+html[data-time="night"] .row-icon.moon{background:#25234d!important;color:#a5a0ff!important}
+html[data-time="night"] .row-icon.apple{background:#3d1a26!important;color:#f7a1bd!important}
+html[data-time="night"] .add-btn,html[data-time="night"] .pill-btn{background:#34d399;color:#062016}
+html[data-time="night"] .btn{background:#34d399;color:#062016}
+html[data-time="night"] .btn.alt{background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+html[data-time="night"] .streak-card{background:linear-gradient(135deg,#2c2210,var(--card) 70%)}
+html[data-time="night"] .streak-num{color:#fbbf24}
+html[data-time="night"] .bottom{background:rgba(22,31,27,.9);border-color:rgba(255,255,255,.06)}
+html[data-time="night"] .bottom button{color:#7d8e86}html[data-time="night"] .bottom button.active{color:#fff}
+html[data-time="night"] .bottom .nav-ai .ai-bubble{border-color:#161f1b}
+html[data-time="night"] .sheet,html[data-time="night"] .streak-modal,html[data-time="night"] .auth-card{background:var(--card);color:var(--ink)}
+html[data-time="night"] .sheet-grab{background:#34423b}
+html[data-time="night"] .res-group,html[data-time="night"] .group,html[data-time="night"] .stat,html[data-time="night"] .analysis-card,html[data-time="night"] .scan-hero,html[data-time="night"] .scan-loading,html[data-time="night"] .scan-status,html[data-time="night"] .search-box,html[data-time="night"] .seg,html[data-time="night"] .chip,html[data-time="night"] .cardmini,html[data-time="night"] .goalbox,html[data-time="night"] .customgoal,html[data-time="night"] .choice,html[data-time="night"] .result,html[data-time="night"] .day{background:#1d2823;color:var(--ink);border-color:var(--line)}
+html[data-time="night"] .seg-b{color:var(--ink2)}html[data-time="night"] .seg-b.on{background:#2c3a33;color:#fff}
+html[data-time="night"] .chip.toggle.on{background:#153528;color:#6ee7b7;border-color:#34d399}
+html[data-time="night"] .choice.sel{background:#153528;border-color:#34d399}
+html[data-time="night"] .day.logged{background:#153528;color:#6ee7b7}
+html[data-time="night"] .field input,html[data-time="night"] .field select,html[data-time="night"] .field textarea,html[data-time="night"] .goal-edit input,html[data-time="night"] .cardmini input,html[data-time="night"] .customgoal input,html[data-time="night"] .search-box input{background:#111a16!important;color:var(--ink)!important;border-color:var(--line)!important}
+html[data-time="night"] .info{background:#153528;color:#bfe9d4}
+html[data-time="night"] .onboard,html[data-time="night"] .auth-overlay,html[data-time="night"] .splash{background:#0d1411;color:var(--ink)}
+html[data-time="night"] .onbox .sub,html[data-time="night"] .auth-sub{color:var(--muted)}
+html[data-time="night"] .t-orange{background:linear-gradient(145deg,#3a2614,#2b1c0f)}html[data-time="night"] .t-blue{background:linear-gradient(145deg,#172846,#121e35)}
+html[data-time="night"] .t-violet{background:linear-gradient(145deg,#291d4a,#1e1638)}html[data-time="night"] .t-green{background:linear-gradient(145deg,#14352a,#0f281f)}
+html[data-time="night"] .tile{color:var(--ink);box-shadow:none}html[data-time="night"] .tile span:last-child{color:var(--muted)}
+html[data-time="night"] .tile-icon{background:rgba(255,255,255,.08)}
+html[data-time="night"] .ring text{fill:var(--ink)}html[data-time="night"] .ring circle:first-child{stroke:#243029}
+html[data-time="night"] .progress{background:#243029}
+html[data-time="night"] .summaryline{border-color:var(--line)}
+html[data-time="night"] .nutri-toast{background:#eef5f1;color:#0c1a14}
+html[data-time="night"] .row-item.tap:active,html[data-time="night"] .meal-row:active{background:#1d2823}
 </style>
 </head>
 <body>
-<div class="splash" id="splash"><div class="splashbox"><div class="js-mascot" data-size="130" data-mood="happy"></div><div class="splash-word"><span class="logo-word">nutri</span></div><p id="splashText">Guardando tu progreso...</p><div class="splashline"><i></i></div></div></div>
+<div class="splash" id="splash"><div class="splashbox"><div class="js-mascot" data-size="130" data-mood="happy"></div><div class="splash-word"><span class="logo-word">Nutri</span></div><p id="splashText">Cargando…</p><div class="splashline"><i></i></div></div></div>
 <div class="app">
 <header><div class="head-row"><div class="head-left"><button type="button" id="backBtn" class="backbtn" onclick="goBack()" aria-label="Volver">‹</button><div class="brand js-logo" data-size="30"></div></div><button type="button" class="avatar-btn" id="headAvatar" onclick="showProfile()" aria-label="Mi perfil"></button></div><div id="today" hidden></div><div id="greeting" hidden></div></header>
 <main id="home"></main>
@@ -322,7 +420,7 @@ header .brand .logo-word{font-size:24px}
 <div class="auth-overlay" id="authOverlay">
   <div class="authbox">
     <div class="auth-mascot js-mascot" data-size="120" data-mood="idle"></div>
-    <h1><span class="logo-word" style="font-size:38px">nutri</span></h1>
+    <h1><span class="logo-word" style="font-size:38px">Nutri</span></h1>
     <p class="auth-sub">Inicia sesión para guardar tu perfil y tu progreso.</p>
     <div class="auth-card" id="loginCard">
       <h2 class="auth-title">Iniciar sesión</h2>
@@ -392,6 +490,7 @@ function mascotSVG(size = 64, mood = 'idle', extraClass = '') {
   </defs>
   <ellipse class="ms-shadow" cx="100" cy="186" rx="52" ry="7" fill="#0b3b25" opacity=".14"/>
   <g class="ms-body">
+    <g class="ms-hand"><ellipse cx="178" cy="76" rx="12" ry="15" fill="url(#${id}b)" transform="rotate(20 178 76)"/></g>
     <g fill="url(#${id}b)">
       <circle cx="100" cy="66" r="44"/>
       <circle cx="56" cy="104" r="40"/>
@@ -411,6 +510,7 @@ function mascotSVG(size = 64, mood = 'idle', extraClass = '') {
     <g class="ms-happy-eyes" fill="none" stroke="#10241a" stroke-width="4.5" stroke-linecap="round">
       <path d="M74 110 Q82 100 90 110"/><path d="M110 110 Q118 100 126 110"/>
     </g>
+    <path class="ms-wink" d="M110 109 Q118 101 126 109" fill="none" stroke="#10241a" stroke-width="4.5" stroke-linecap="round"/>
     <path class="ms-smile" d="M89 126 Q100 137 111 126" fill="none" stroke="#10241a" stroke-width="4" stroke-linecap="round"/>
     <path class="ms-open" d="M88 125 Q100 144 112 125 Z" fill="#10241a"/>
   </g>
@@ -444,7 +544,7 @@ function logoMarkSVG(size = 40) {
 </svg>`;
 }
 function logoHTML(size = 36) {
-  return `<span class="logo">${logoMarkSVG(size)}<span class="logo-word">nutri</span></span>`;
+  return `<span class="logo">${logoMarkSVG(size)}<span class="logo-word">Nutri</span></span>`;
 }
 
 function hydrateBrand(root=document){
@@ -453,6 +553,48 @@ function hydrateBrand(root=document){
   root.querySelectorAll('.js-mascot').forEach(el=>{el.innerHTML=mascotSVG(+el.dataset.size||80,el.dataset.mood||'idle')});
   root.querySelectorAll('.js-logo').forEach(el=>{el.innerHTML=logoHTML(+el.dataset.size||30)});
 }
+/* =========================================================
+   HORA DEL DÍA: saludo y colores (día claro, tarde atardecer, noche oscura)
+   ========================================================= */
+function timeOfDay(d=new Date()){const h=d.getHours();return h>=5&&h<12?'day':h>=12&&h<19?'sunset':'night'}
+function greetingWord(t=timeOfDay()){return t==='day'?'Buenos días':t==='sunset'?'Buenas tardes':'Buenas noches'}
+function themePref(){try{return localStorage.getItem('nutri_theme')||'auto'}catch(e){return 'auto'}}
+function applyTimeTheme(){
+  const pref=themePref();
+  const t=pref==='auto'?timeOfDay():pref==='dark'?'night':'day';
+  document.documentElement.dataset.time=t;
+  const m=document.querySelector('meta[name="theme-color"]');
+  if(m)m.content=t==='night'?'#0d1411':t==='sunset'?'#fbeee2':'#f3f5f4';
+}
+setInterval(()=>{const before=document.documentElement.dataset.time;applyTimeTheme();if(before!==document.documentElement.dataset.time&&history.state?.view==='home'&&profile)showHome(true)},10*60*1000);
+function cycleTheme(){
+  const order=['auto','light','dark'],next=order[(order.indexOf(themePref())+1)%3];
+  try{localStorage.setItem('nutri_theme',next)}catch(e){}
+  applyTimeTheme();showProfile(true);
+}
+function themeLabel(){return {auto:'Automática (según la hora)',light:'Siempre clara',dark:'Siempre oscura'}[themePref()]}
+
+// Pantalla de bienvenida: el brócoli saluda, guiña y flota. Se muestra al abrir la app
+// (máximo una vez cada 30 min para no estorbar) y siempre la primera vez.
+function showGreeting({first=false,after=null}={}){
+  let last=0;try{last=+localStorage.getItem('nutri_greet_at')||0}catch(e){}
+  if(!first&&Date.now()-last<30*60*1000){if(after)setTimeout(after,300);return}
+  try{localStorage.setItem('nutri_greet_at',String(Date.now()))}catch(e){}
+  const t=timeOfDay(),name=(profile?.name||'').trim();
+  const welcome=profile?.sex==='male'?'¡Bienvenido a Nutri!':profile?.sex==='female'?'¡Bienvenida a Nutri!':'¡Te damos la bienvenida a Nutri!';
+  const title=first?welcome:`¡${greetingWord(t)}${name?', '+esc(name):''}!`;
+  const sub=first?`${greetingWord(t)}. Soy tu brócoli y te voy a acompañar a comer mejor y moverte más.`
+    :t==='day'?'Empecemos el día con energía.':t==='sunset'?'¿Cómo va tu día? Mira lo que llevas.':'Registra tu cena y descansa bien.';
+  const sky=t==='day'?'<div class="sky-sun"></div>':t==='sunset'?'<div class="sky-dusk"></div>':'<div class="sky-moon"></div>'+Array.from({length:14},(_,i)=>`<i class="star" style="left:${(i*37)%100}%;top:${(i*23)%55}%;animation-delay:${(i%5)*.4}s"></i>`).join('');
+  const el=document.createElement('div');
+  el.className='greet greet-'+t;el.id='greet';
+  el.innerHTML=`<div class="greet-sky">${sky}</div><div class="greet-body"><div class="greet-mascot">${mascotSVG(170,'wave')}</div><h1>${title}</h1><p>${sub}</p><button class="btn greet-btn">${first?'¡Empecemos!':'Continuar'}</button></div>`;
+  const done=()=>{if(!el.isConnected)return;el.classList.add('out');setTimeout(()=>{el.remove();if(after)after()},350)};
+  el.addEventListener('click',done);
+  document.body.appendChild(el);
+  if(!first)setTimeout(done,3200);
+}
+
 // Globito con el brócoli feliz cuando se registra algo.
 let __toastT=null;
 function nutriToast(msg){
@@ -533,6 +675,7 @@ async function registerAccount(){
     if(p!==p2)return authError('registerError','Las contraseñas no coinciden.');
     if(btn){btn.disabled=true;btn.textContent='Creando...'}
     const {data,error}=await sb.auth.signUp({email,password:p});
+    window.__justRegistered=true;
     if(error)return authError('registerError',error.message==='User already registered'?'Ese correo ya tiene una cuenta. Intenta iniciar sesión.':'No se pudo crear la cuenta: '+error.message);
     if(!data.session){
       // El proyecto de Supabase pide confirmar el correo antes de dejar entrar.
@@ -578,7 +721,14 @@ async function logoutAccount(){
   document.getElementById('authOverlay').style.display='block';
   showLogin();
 }
-function startAfterAuth(){normalizeProfile();const hasProfile=!!(profile&&profile.name&&profile.age);if(hasProfile){showHome();document.getElementById('splashText').textContent='Cargando tu progreso...';setTimeout(()=>{document.getElementById('splash')?.classList.add('hide');maybeCelebrateStreak()},450)}else{document.getElementById('onboard').classList.add('show');showOnStep(1);document.getElementById('splashText').textContent='Vamos a preparar tu perfil...';setTimeout(()=>document.getElementById('splash')?.classList.add('hide'),450)}}
+function hideSplash(){const sp=document.getElementById('splash');if(!sp||sp.classList.contains('hide'))return;sp.classList.add('hide');setTimeout(()=>sp.remove(),400)}
+function startAfterAuth(){
+  normalizeProfile();applyTimeTheme();
+  const hasProfile=!!(profile&&profile.name&&profile.age);
+  if(hasProfile)showHome();else{document.getElementById('onboard').classList.add('show');showOnStep(1)}
+  hideSplash();
+  showGreeting({first:!hasProfile||window.__justRegistered,after:hasProfile?maybeCelebrateStreak:null});
+}
 async function bootAuth(){
   const {data:{session}}=await sb.auth.getSession();
   if(session){
@@ -589,7 +739,7 @@ async function bootAuth(){
     return true;
   }
   document.getElementById('authOverlay').style.display='block';
-  document.getElementById('splashText').textContent='Inicia sesión o crea tu cuenta';
+  applyTimeTheme();hideSplash();
   return false;
 }
 
@@ -1234,7 +1384,7 @@ function showHome(fromHistory=false){
   let fecha=new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});fecha=fecha.charAt(0).toUpperCase()+fecha.slice(1);
   const qa=[['openScanner()','camera','Escanear'],[`openAdd('${mealByTime()}')`,'plus','Agregar'],['openAIRecipe()','chef','Recetas'],['openAIMealPlan()','calendar','Plan'],['openAIRoutine()','dumbbell','Rutina']];
   let html=`<section class="hero">
-    <div class="hero-hello">Hola, ${esc(profile.name||'')}</div><div class="hero-date">${fecha}</div>
+    <div class="hero-hello">${greetingWord()}, ${esc(profile.name||'')}</div><div class="hero-date">${fecha}</div>
     <div class="hero-num ${left<0?'over':''}"><span class="big-num">${fmtNum(Math.abs(left))}</span><span class="unit">kcal ${left<0?'por encima':'restantes'}</span></div>
     <div class="hero-sub">${fmtNum(t.k)} consumidas de ${fmtNum(goal)}</div>
     <div class="macro-bar">${seg(kc.p,'mp')}${seg(kc.c,'mc')}${seg(kc.f,'mf')}</div>
@@ -1298,6 +1448,7 @@ function showProfile(fromHistory=false){
   <section class="card list">${hist.length?hist.map(x=>`<div class="row-item"><div class="row-icon">${ic('scale',18)}</div><div class="row-main"><div class="row-title">${x.weight} kg</div></div><div class="row-end muted">${new Date(x.date+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'})}</div></div>`).join(''):'<div class="empty-row">Todavía no hay registros de peso.</div>'}</section>
   <div class="section-title">Más</div>
   <section class="card list">
+    <button class="row-item tap" onclick="cycleTheme()"><div class="row-icon">${ic(timeOfDay()==='night'?'moon':'sun',18)}</div><div class="row-main"><div class="row-title">Apariencia</div><div class="row-sub">${themeLabel()}</div></div><div class="row-end">${ic('chevron',18)}</div></button>
     <button class="row-item tap" onclick="openMyFoods()"><div class="row-icon">${ic('heart',18)}</div><div class="row-main"><div class="row-title">Mis alimentos</div><div class="row-sub">${customFoods.length} guardados</div></div><div class="row-end">${ic('chevron',18)}</div></button>
     <button class="row-item tap" onclick="openOnboarding()"><div class="row-icon">${ic('edit',18)}</div><div class="row-main"><div class="row-title">Editar mis datos</div></div><div class="row-end">${ic('chevron',18)}</div></button>
     <button class="row-item tap" onclick="shareToday()"><div class="row-icon">${ic('share',18)}</div><div class="row-main"><div class="row-title">Compartir mi día</div></div><div class="row-end">${ic('chevron',18)}</div></button>
@@ -1501,6 +1652,7 @@ function showAssistant(fromHistory=false){
   ${routs?`<div class="section-title">Mis rutinas <span>${aiRoutines.length}</span></div><div class="card list">${routs}</div>`:''}`;
 }
 
+applyTimeTheme();
 hydrateBrand();
 initActivity();
 if(!history.state?.view) history.replaceState({view:'home'},'',location.href);
@@ -1525,8 +1677,7 @@ window.addEventListener('scroll',()=>{
 const splash=document.getElementById("splash");
 // Arranque persistente: si ya existe un perfil válido, una actualización nunca debe pedir los datos otra vez.
 bootAuth();
-setTimeout(()=>{if(document.getElementById("authOverlay").style.display!=="block") splash.classList.add("hide")},1100);
-setTimeout(()=>splash.remove(),1500);
+setTimeout(()=>hideSplash(),7000); // respaldo por si la red tarda demasiado
 // Registramos el service worker para que la app sea instalable y funcione offline.
 // sw.js siempre pide index.html a la red primero (no de caché), así que el teléfono
 // nunca se queda pegado con una versión vieja: ver comentario en sw.js.
