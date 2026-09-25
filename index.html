@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3f5f4">
-<meta name="nutri-version" content="23">
+<meta name="nutri-version" content="24">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -399,6 +399,9 @@ html[data-time="night"] .progress{background:#243029}
 html[data-time="night"] .summaryline{border-color:var(--line)}
 html[data-time="night"] .nutri-toast{background:#eef5f1;color:#0c1a14}
 html[data-time="night"] .row-item.tap:active,html[data-time="night"] .meal-row:active{background:#1d2823}
+.mascot-svg .ms-glasses{transform-box:fill-box;transform-origin:50% 50%}
+.mascot-svg.mood-celebrate .ms-glasses,.mascot-svg.poked .ms-glasses{animation:msGlasses .9s ease-in-out infinite}
+@keyframes msGlasses{0%,100%{transform:translateY(0)}40%{transform:translateY(-3px)}}
 </style>
 </head>
 <body>
@@ -511,6 +514,14 @@ function mascotSVG(size = 64, mood = 'idle', extraClass = '') {
       <path d="M74 110 Q82 100 90 110"/><path d="M110 110 Q118 100 126 110"/>
     </g>
     <path class="ms-wink" d="M110 109 Q118 101 126 109" fill="none" stroke="#10241a" stroke-width="4.5" stroke-linecap="round"/>
+    <g class="ms-glasses">
+      <circle cx="82" cy="107" r="15.5" fill="#fff" fill-opacity=".18" stroke="#10241a" stroke-width="4"/>
+      <circle cx="118" cy="107" r="15.5" fill="#fff" fill-opacity=".18" stroke="#10241a" stroke-width="4"/>
+      <path d="M96.5 104 Q100 100 103.5 104" fill="none" stroke="#10241a" stroke-width="4" stroke-linecap="round"/>
+      <path d="M66.8 103 L57 98 M133.2 103 L143 98" fill="none" stroke="#10241a" stroke-width="4" stroke-linecap="round"/>
+      <path d="M74 99 Q78 95 83 95" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M110 99 Q114 95 119 95" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
     <path class="ms-smile" d="M89 126 Q100 137 111 126" fill="none" stroke="#10241a" stroke-width="4" stroke-linecap="round"/>
     <path class="ms-open" d="M88 125 Q100 144 112 125 Z" fill="#10241a"/>
   </g>
@@ -540,6 +551,7 @@ function logoMarkSVG(size = 40) {
     <circle cx="41" cy="62" r="14"/><circle cx="59" cy="62" r="14"/><rect x="34" y="46" width="32" height="26" rx="10"/>
   </g>
   <g fill="#047857"><circle cx="43.5" cy="55" r="3.2"/><circle cx="56.5" cy="55" r="3.2"/></g>
+  <g fill="none" stroke="#047857" stroke-width="2.2" stroke-linecap="round"><circle cx="43.5" cy="55" r="6.2"/><circle cx="56.5" cy="55" r="6.2"/><path d="M49.3 54 Q50 53 50.7 54"/></g>
   <path d="M45 63 Q50 68 55 63" fill="none" stroke="#047857" stroke-width="2.6" stroke-linecap="round"/>
 </svg>`;
 }

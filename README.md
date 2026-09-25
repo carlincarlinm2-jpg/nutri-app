@@ -1,6 +1,6 @@
 # Nutri — app de nutrición y fitness con IA
 
-**App publicada:** https://nutri-app-sage-sigma.vercel.app
+**App publicada:** https://hola-nutri.vercel.app
 
 ## Qué cambió respecto a la versión anterior
 - **Cuentas y datos en la nube (Supabase)**: antes todo vivía en el navegador del teléfono
