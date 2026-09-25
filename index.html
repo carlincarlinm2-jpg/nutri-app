@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3f5f4">
-<meta name="nutri-version" content="26">
+<meta name="nutri-version" content="27">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -249,6 +249,17 @@ header .brand .logo-word{font-size:24px}
 .profile-hero{text-align:center;margin:6px 16px 0;padding:20px 18px;border-radius:28px;background:radial-gradient(100% 80% at 50% 0,#d4f3e4,rgba(212,243,228,0) 70%),#fff;box-shadow:0 1px 2px rgba(12,26,20,.04),0 18px 40px -26px rgba(4,120,87,.4)}
 .profile-mascot{display:flex;justify-content:center}
 .profile-hero h1{margin:8px 0 2px;font-size:26px}
+.rem-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.rem-row:last-child{border-bottom:0}
+.rem-row .row-main{flex:1;min-width:0}
+.rem-row input[type=time]{border:1.5px solid var(--line);border-radius:12px;padding:6px 6px;font:inherit;font-size:15px;font-weight:700;background:transparent;color:inherit;width:122px;flex:none}
+.rem-row .row-icon{flex:none}
+.rem-row input[type=time]:disabled{opacity:.35}
+.tgl{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:99px;background:#d6dcd9;position:relative;cursor:pointer;flex:none;transition:background .2s}
+.tgl::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.tgl:checked{background:#22c55e}.tgl:checked::after{transform:translateX(18px)}
+.push-box{border-radius:18px;padding:14px;background:rgba(34,197,94,.1);margin-bottom:12px;font-size:13px;line-height:1.45}
+.push-box b{display:block;font-size:14px;margin-bottom:4px}
 .goal-edit{display:flex;align-items:center;gap:10px}
 .goal-edit input{flex:1;min-width:0;font-size:22px;font-weight:700;border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;font-family:inherit;background:#fafbfb}
 .goal-edit span{color:var(--muted);font-weight:600}
@@ -791,6 +802,7 @@ async function logoutAccount(){
 }
 function hideSplash(){const sp=document.getElementById('splash');if(!sp||sp.classList.contains('hide'))return;sp.classList.add('hide');setTimeout(()=>sp.remove(),400)}
 function startAfterAuth(){
+  loadReminders().catch(()=>{});
   normalizeProfile();applyTimeTheme();
   const hasProfile=!!(profile&&profile.name&&profile.age);
   if(hasProfile)showHome();else{document.getElementById('onboard').classList.add('show');showOnStep(1)}
@@ -1417,6 +1429,7 @@ const ICONS={
   tag:'<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.5"/>',
   bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>',
   mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
   image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
 };
 function ic(name,size=20){return `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||''}</svg>`}
@@ -1517,6 +1530,7 @@ function showProfile(fromHistory=false){
   <div class="section-title">Más</div>
   <section class="card list">
     <button class="row-item tap" onclick="cycleTheme()"><div class="row-icon">${ic(timeOfDay()==='night'?'moon':'sun',18)}</div><div class="row-main"><div class="row-title">Apariencia</div><div class="row-sub">${themeLabel()}</div></div><div class="row-end">${ic('chevron',18)}</div></button>
+    <button class="row-item tap" onclick="openReminders()"><div class="row-icon">${ic('bell',18)}</div><div class="row-main"><div class="row-title">Recordatorios</div><div class="row-sub">${remindersSub()}</div></div><div class="row-end">${ic('chevron',18)}</div></button>
     <button class="row-item tap" onclick="openMyFoods()"><div class="row-icon">${ic('heart',18)}</div><div class="row-main"><div class="row-title">Mis alimentos</div><div class="row-sub">${customFoods.length} guardados</div></div><div class="row-end">${ic('chevron',18)}</div></button>
     <button class="row-item tap" onclick="openOnboarding()"><div class="row-icon">${ic('edit',18)}</div><div class="row-main"><div class="row-title">Editar mis datos</div></div><div class="row-end">${ic('chevron',18)}</div></button>
     <button class="row-item tap" onclick="shareToday()"><div class="row-icon">${ic('share',18)}</div><div class="row-main"><div class="row-title">Compartir mi día</div></div><div class="row-end">${ic('chevron',18)}</div></button>
@@ -1531,6 +1545,103 @@ function openMyFoods(){
   openSheet(sheetHead('Mis alimentos',customFoods.length+' guardados')+(customFoods.length?`<div class="res-group">${customFoods.map((x,i)=>`<div class="row-item"><div class="row-main"><div class="row-title">${esc(x[0])}</div><div class="row-sub">${esc(x[1])} · ${fmtNum(x[2])} kcal · P ${x[3]} · C ${x[4]} · G ${x[5]}</div></div><button class="icon-btn" onclick="deleteCustomFood(${i})" aria-label="Borrar">${ic('trash',17)}</button></div>`).join('')}</div>`:'<div class="empty-row">Aún no tienes alimentos guardados. Cuando crees uno o elijas un producto de marca, aparecerá aquí.</div>')+`<button class="btn" onclick="openCustom(mealByTime())">${ic('plus',18)} Crear alimento</button>`);
 }
 function deleteCustomFood(i){if(!confirm('¿Borrar '+customFoods[i][0]+' de Mis alimentos?'))return;customFoods.splice(i,1);saveCustomFoods();openMyFoods()}
+
+/* =========================================================
+   RECORDATORIOS con notificaciones (usa el servidor de Ritmo, gratis)
+   ========================================================= */
+const PUSH_API='https://hola-ritmo.vercel.app';
+const NUTRI_REMINDERS=[
+  {id:'desayuno',title:'Desayuno',sub:'Registra lo que desayunas',time:'08:00',days:[0,1,2,3,4,5,6],icon:'sun'},
+  {id:'agua1',title:'Agua',sub:'Media mañana',time:'11:00',days:[0,1,2,3,4,5,6],icon:'apple'},
+  {id:'comida',title:'Comida',sub:'Registra tu comida',time:'14:30',days:[0,1,2,3,4,5,6],icon:'utensils'},
+  {id:'agua2',title:'Agua',sub:'Por la tarde',time:'17:00',days:[0,1,2,3,4,5,6],icon:'apple'},
+  {id:'ejercicio',title:'Entrenar',sub:'Lunes a viernes',time:'18:30',days:[1,2,3,4,5],icon:'dumbbell'},
+  {id:'cena',title:'Cena',sub:'Registra tu cena',time:'20:30',days:[0,1,2,3,4,5,6],icon:'moon'},
+  {id:'pesarse',title:'Pesarte',sub:'Cada lunes',time:'07:30',days:[1],icon:'scale'},
+];
+let nutriReminders=null; // filas de rt_items con app='nutri'
+function remTitle(r){return r.title+' · '+r.id}
+async function loadReminders(){
+  const {data,error}=await sb.from('rt_items').select('id,title,time_of_day,days,moment').eq('app','nutri').eq('kind','habit');
+  if(error)throw error;nutriReminders=data||[];return nutriReminders;
+}
+function remindersSub(){
+  if(!nutriReminders)return 'Avisos de comidas, agua y ejercicio';
+  const n=nutriReminders.length;return n?n+(n===1?' activo':' activos'):'Desactivados';
+}
+function remFind(def){return (nutriReminders||[]).find(x=>x.moment==='nutri:'+def.id)}
+function pushState(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){
+    const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    const standalone=window.navigator.standalone||matchMedia('(display-mode: standalone)').matches;
+    return ios&&!standalone?'install':'unsupported';
+  }
+  if(Notification.permission==='denied')return 'denied';
+  return Notification.permission==='granted'&&localStorage.getItem('nutri_push')==='on'?'on':'off';
+}
+function pushBoxHtml(){
+  const st=pushState();
+  if(st==='on')return `<div class="push-box"><b>Notificaciones activadas</b>Te llegarán a este teléfono aunque la app esté cerrada. <button class="link-btn" onclick="testNutriPush(this)">Mandar una de prueba</button></div>`;
+  if(st==='install')return `<div class="push-box"><b>Primero instala Nutri</b>En iPhone abre Nutri en Safari, toca Compartir y luego "Agregar a pantalla de inicio". Abre Nutri desde ese ícono y vuelve aquí.</div>`;
+  if(st==='unsupported')return `<div class="push-box"><b>Este navegador no permite avisos</b>Abre Nutri desde el ícono instalado en tu teléfono.</div>`;
+  if(st==='denied')return `<div class="push-box"><b>Las notificaciones están bloqueadas</b>Actívalas en Ajustes › Notificaciones › Nutri y vuelve aquí.</div>`;
+  return `<div class="push-box"><b>Activa las notificaciones</b>Para que tu brócoli te avise a la hora de comer, tomar agua o entrenar.<button class="btn" style="margin-top:10px" onclick="enableNutriPush(this)">${ic('bell',18)} Activar notificaciones</button></div>`;
+}
+async function openReminders(){
+  openSheet(sheetHead('Recordatorios','Cargando…')+aiLoadingHtml('Cargando tus recordatorios'));
+  try{await loadReminders()}catch(e){console.error(e);openSheet(sheetHead('Recordatorios','')+aiErrorHtml('No se pudieron cargar. Revisa tu internet.'));return}
+  renderReminders();
+}
+function renderReminders(){
+  const rows=NUTRI_REMINDERS.map(d=>{const cur=remFind(d);const on=!!cur;const t=(cur&&cur.time_of_day)||d.time;
+    return `<div class="rem-row"><div class="row-icon">${ic(d.icon,18)}</div><div class="row-main"><div class="row-title">${d.title}</div><div class="row-sub">${d.sub}</div></div><input type="time" id="rt_${d.id}" value="${t}" ${on?'':'disabled'}><input type="checkbox" class="tgl" id="ro_${d.id}" ${on?'checked':''} onchange="document.getElementById('rt_${d.id}').disabled=!this.checked" aria-label="${d.title}"></div>`}).join('');
+  openSheet(sheetHead('Recordatorios','Tu brócoli te avisa a la hora que elijas')+pushBoxHtml()+`<section class="card" style="padding:2px 14px">${rows}</section><button class="btn" style="margin-top:14px" onclick="saveReminders(this)">${ic('check',18)} Guardar recordatorios</button>`);
+}
+async function saveReminders(btn){
+  btn.disabled=true;
+  try{
+    const {data:{session}}=await sb.auth.getSession();if(!session)throw new Error('Sesión expirada');
+    const uid=session.user.id;
+    const want=NUTRI_REMINDERS.filter(d=>document.getElementById('ro_'+d.id).checked).map(d=>({d,time:document.getElementById('rt_'+d.id).value||d.time}));
+    // Borra los que se apagaron y actualiza/crea los encendidos.
+    const keep=new Set(want.map(w=>'nutri:'+w.d.id));
+    const del=(nutriReminders||[]).filter(x=>!keep.has(x.moment)).map(x=>x.id);
+    if(del.length){const {error}=await sb.from('rt_items').delete().in('id',del);if(error)throw error}
+    for(const w of want){
+      const cur=remFind(w.d);
+      const row={title:w.d.title,time_of_day:w.time,days:w.d.days,moment:'nutri:'+w.d.id,app:'nutri',kind:'habit',user_id:uid};
+      if(cur){if(cur.time_of_day!==w.time){const {error}=await sb.from('rt_items').update({time_of_day:w.time,last_notified_date:null}).eq('id',cur.id);if(error)throw error}}
+      else{const {error}=await sb.from('rt_items').insert(row);if(error)throw error}
+    }
+    await loadReminders();
+    if(want.length&&pushState()==='off'){renderReminders();nutriToast('Guardado. Ahora activa las notificaciones');return}
+    closeProfile();showProfile(true);nutriToast(want.length?'Recordatorios guardados':'Recordatorios apagados');
+  }catch(e){console.error(e);btn.disabled=false;alert('No se pudieron guardar: '+(e.message||e))}
+}
+function b64ToU8(b){const p='='.repeat((4-b.length%4)%4),s=atob((b+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from([...s].map(c=>c.charCodeAt(0)))}
+async function enableNutriPush(btn){
+  try{
+    if(btn)btn.disabled=true;
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){renderReminders();return}
+    const reg=await navigator.serviceWorker.ready;
+    const {publicKey}=await (await fetch(PUSH_API+'/api/vapid')).json();
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToU8(publicKey)});
+    const j=sub.toJSON();const {data:{session}}=await sb.auth.getSession();
+    const {error}=await sb.from('rt_push_subs').upsert({user_id:session.user.id,app:'nutri',endpoint:j.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,tz:Intl.DateTimeFormat().resolvedOptions().timeZone},{onConflict:'endpoint'});
+    if(error)throw error;
+    localStorage.setItem('nutri_push','on');renderReminders();nutriToast('¡Notificaciones activadas!');
+  }catch(e){console.error(e);if(btn)btn.disabled=false;alert('No se pudieron activar: '+(e.message||e))}
+}
+async function testNutriPush(btn){
+  btn.disabled=true;
+  try{const {data:{session}}=await sb.auth.getSession();
+    const r=await fetch(PUSH_API+'/api/test-push',{method:'POST',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({app:'nutri'})});const j=await r.json().catch(()=>({}));
+    nutriToast(r.ok?'Enviada, revisa tus notificaciones':'No se pudo: '+(j.error||r.status));
+  }catch(e){nutriToast('No se pudo enviar')}
+  btn.disabled=false;
+}
 
 /* =========================================================
    ASISTENTE CON IA: recetas, plan semanal, rutina, progreso

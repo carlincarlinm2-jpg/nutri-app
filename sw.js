@@ -5,7 +5,7 @@
 // Los archivos estáticos (íconos, manifest) sí se cachean para que la app abra rápido
 // y funcione aunque no haya internet en ese instante (aunque sin poder sincronizar datos).
 
-const CACHE_NAME = 'nutri-static-v5';
+const CACHE_NAME = 'nutri-static-v6';
 const STATIC_ASSETS = [
   './manifest.json',
   './icons/icon-192.png',
@@ -57,4 +57,18 @@ self.addEventListener('fetch', (event) => {
       return cached || network;
     })
   );
+});
+
+// Notificaciones: recordatorios de comidas, agua, ejercicio y peso.
+self.addEventListener('push', (e) => {
+  let d = {}; try { d = e.data ? e.data.json() : {}; } catch (_) { d = { title: 'Nutri', body: e.data && e.data.text() }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'Nutri', { body: d.body || '', tag: d.tag, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', data: { url: d.url || '/' }, vibrate: [120, 60, 120] }));
+});
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || '/';
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((cs) => {
+    for (const c of cs) { if ('focus' in c) return c.focus(); }
+    return self.clients.openWindow(url);
+  }));
 });
