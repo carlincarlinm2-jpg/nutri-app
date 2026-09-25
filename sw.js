@@ -5,7 +5,7 @@
 // Los archivos estáticos (íconos, manifest) sí se cachean para que la app abra rápido
 // y funcione aunque no haya internet en ese instante (aunque sin poder sincronizar datos).
 
-const CACHE_NAME = 'nutri-static-v3';
+const CACHE_NAME = 'nutri-static-v4';
 const STATIC_ASSETS = [
   './manifest.json',
   './icons/icon-192.png',

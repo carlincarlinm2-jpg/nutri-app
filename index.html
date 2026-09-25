@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3f5f4">
-<meta name="nutri-version" content="24">
+<meta name="nutri-version" content="25">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -47,6 +47,7 @@ header{padding:22px 20px 10px;background:white;position:sticky;top:0;z-index:3;b
 .mascot-svg.mood-happy .ms-body{animation:msBounce 1.1s cubic-bezier(.3,.7,.4,1) infinite}
 .mascot-svg.mood-happy .ms-shadow{animation:msShadowBounce 1.1s cubic-bezier(.3,.7,.4,1) infinite}
 .mascot-svg.mood-happy .ms-eyes{opacity:0}.mascot-svg.mood-happy .ms-happy-eyes{opacity:1}
+.mascot-svg.mood-happy .ms-smile{opacity:0}.mascot-svg.mood-happy .ms-open{opacity:1}
 .mascot-svg.mood-happy .ms-blush{opacity:.6}
 /* celebra: salta, boca abierta y destellos */
 .mascot-svg.mood-celebrate .ms-body{animation:msJump .9s cubic-bezier(.3,.7,.4,1) infinite}
@@ -400,6 +401,10 @@ html[data-time="night"] .summaryline{border-color:var(--line)}
 html[data-time="night"] .nutri-toast{background:#eef5f1;color:#0c1a14}
 html[data-time="night"] .row-item.tap:active,html[data-time="night"] .meal-row:active{background:#1d2823}
 .mascot-svg .ms-glasses{transform-box:fill-box;transform-origin:50% 50%}
+.mascot-svg .ms-glint path{animation:msGlint 4.5s ease-in-out infinite}
+@keyframes msGlint{0%,70%{transform:translateX(-40px)}85%,100%{transform:translateX(60px)}}
+.mascot-svg.mood-wave .ms-glasses{animation:msCool 3.2s ease-in-out infinite}
+@keyframes msCool{0%,55%,80%,100%{transform:none}62%,74%{transform:translateY(7px) rotate(-6deg)}}
 .mascot-svg.mood-celebrate .ms-glasses,.mascot-svg.poked .ms-glasses{animation:msGlasses .9s ease-in-out infinite}
 @keyframes msGlasses{0%,100%{transform:translateY(0)}40%{transform:translateY(-3px)}}
 </style>
@@ -487,6 +492,8 @@ function mascotSVG(size = 64, mood = 'idle', extraClass = '') {
     <linearGradient id="${id}b" x1="30" y1="40" x2="170" y2="170" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#6fd6a0"/><stop offset="1" stop-color="#23945c"/>
     </linearGradient>
+    <linearGradient id="${id}g" x1="0" y1="97" x2="0" y2="119" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2b3a34"/><stop offset="1" stop-color="#070a09"/></linearGradient>
+    <clipPath id="${id}c"><path d="M61 97 H97.5 Q99.5 97 99 100 L96.5 112 Q95 119 88 119 H72 Q65 119 63.5 112 L60.5 100 Q60 97 61 97Z M102.5 97 H139 Q140 97 139.5 100 L136.5 112 Q135 119 128 119 H112 Q105 119 103.5 112 L101 100 Q100.5 97 102.5 97Z"/></clipPath>
     <radialGradient id="${id}h" cx="84" cy="66" r="44" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
     </radialGradient>
@@ -503,9 +510,6 @@ function mascotSVG(size = 64, mood = 'idle', extraClass = '') {
       <rect x="60" y="92" width="80" height="60" rx="20"/>
     </g>
     <ellipse cx="84" cy="70" rx="44" ry="32" fill="url(#${id}h)"/>
-    <g class="ms-blush" fill="#ff8fa3" opacity=".35">
-      <ellipse cx="66" cy="124" rx="11" ry="6.5"/><ellipse cx="134" cy="124" rx="11" ry="6.5"/>
-    </g>
     <g class="ms-eyes">
       <g class="ms-eye"><ellipse cx="82" cy="108" rx="7" ry="9" fill="#10241a"/><circle cx="84.5" cy="104.5" r="2.6" fill="#fff"/></g>
       <g class="ms-eye"><ellipse cx="118" cy="108" rx="7" ry="9" fill="#10241a"/><circle cx="120.5" cy="104.5" r="2.6" fill="#fff"/></g>
@@ -515,15 +519,15 @@ function mascotSVG(size = 64, mood = 'idle', extraClass = '') {
     </g>
     <path class="ms-wink" d="M110 109 Q118 101 126 109" fill="none" stroke="#10241a" stroke-width="4.5" stroke-linecap="round"/>
     <g class="ms-glasses">
-      <circle cx="82" cy="107" r="15.5" fill="#fff" fill-opacity=".18" stroke="#10241a" stroke-width="4"/>
-      <circle cx="118" cy="107" r="15.5" fill="#fff" fill-opacity=".18" stroke="#10241a" stroke-width="4"/>
-      <path d="M96.5 104 Q100 100 103.5 104" fill="none" stroke="#10241a" stroke-width="4" stroke-linecap="round"/>
-      <path d="M66.8 103 L57 98 M133.2 103 L143 98" fill="none" stroke="#10241a" stroke-width="4" stroke-linecap="round"/>
-      <path d="M74 99 Q78 95 83 95" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M110 99 Q114 95 119 95" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M58 96 H142" stroke="#0b0f0d" stroke-width="6" stroke-linecap="round"/>
+      <path d="M61 97 H97.5 Q99.5 97 99 100 L96.5 112 Q95 119 88 119 H72 Q65 119 63.5 112 L60.5 100 Q60 97 61 97Z" fill="url(#${id}g)" stroke="#0b0f0d" stroke-width="2.5"/>
+      <path d="M102.5 97 H139 Q140 97 139.5 100 L136.5 112 Q135 119 128 119 H112 Q105 119 103.5 112 L101 100 Q100.5 97 102.5 97Z" fill="url(#${id}g)" stroke="#0b0f0d" stroke-width="2.5"/>
+      <g class="ms-glint" clip-path="url(#${id}c)"><path d="M60 125 L80 95 H88 L68 125Z M102 125 L122 95 H128 L108 125Z" fill="#fff" opacity=".35"/></g>
+      <path d="M67 102 L73 102" stroke="#fff" stroke-opacity=".5" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M108 102 L114 102" stroke="#fff" stroke-opacity=".5" stroke-width="2.2" stroke-linecap="round"/>
     </g>
-    <path class="ms-smile" d="M89 126 Q100 137 111 126" fill="none" stroke="#10241a" stroke-width="4" stroke-linecap="round"/>
-    <path class="ms-open" d="M88 125 Q100 144 112 125 Z" fill="#10241a"/>
+    <path class="ms-smile" d="M88 129 Q101 137 114 126" fill="none" stroke="#10241a" stroke-width="4" stroke-linecap="round"/>
+    <path class="ms-open" d="M86 127 Q100 146 115 125 Z" fill="#10241a"/><path class="ms-open" d="M91 128.5 H110" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
   </g>
   <g class="ms-sparks" fill="#ffc53d">
     <path d="M30 40 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/>
@@ -550,9 +554,8 @@ function logoMarkSVG(size = 40) {
     <circle cx="50" cy="38" r="17"/><circle cx="33" cy="52" r="15"/><circle cx="67" cy="52" r="15"/>
     <circle cx="41" cy="62" r="14"/><circle cx="59" cy="62" r="14"/><rect x="34" y="46" width="32" height="26" rx="10"/>
   </g>
-  <g fill="#047857"><circle cx="43.5" cy="55" r="3.2"/><circle cx="56.5" cy="55" r="3.2"/></g>
-  <g fill="none" stroke="#047857" stroke-width="2.2" stroke-linecap="round"><circle cx="43.5" cy="55" r="6.2"/><circle cx="56.5" cy="55" r="6.2"/><path d="M49.3 54 Q50 53 50.7 54"/></g>
-  <path d="M45 63 Q50 68 55 63" fill="none" stroke="#047857" stroke-width="2.6" stroke-linecap="round"/>
+  <g fill="#0b2e20"><path d="M36 51 H49 L48 57 Q47.5 60 44.5 60 H40 Q37 60 36.5 57Z"/><path d="M51 51 H64 L63.5 57 Q63 60 60 60 H55.5 Q52.5 60 52 57Z"/><rect x="35" y="50" width="30" height="2.4" rx="1.2"/></g>
+  <path d="M45 64.5 Q50.5 68.5 56 63.5" fill="none" stroke="#0b2e20" stroke-width="2.6" stroke-linecap="round"/>
 </svg>`;
 }
 function logoHTML(size = 36) {
