@@ -1,0 +1,9 @@
+{
+  "name": "nutri-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nutri — app de nutrición y fitness personal con IA (Claude) y Supabase.",
+  "engines": {
+    "node": ">=18"
+  }
+}

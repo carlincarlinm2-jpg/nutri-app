@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#20b486">
+<meta name="nutri-version" content="21">
+<link rel="manifest" href="manifest.json">
+<title>Nutri — Mi nutrición</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f5f7f6;color:#17221e}
+.app{max-width:520px;margin:auto;min-height:100vh;background:#f8faf9;padding-bottom:84px}
+header{padding:22px 20px 10px;background:white;position:sticky;top:0;z-index:3;border-bottom:1px solid #edf0ef}
+.brand{font-size:25px;font-weight:800;color:#15966d}.date{color:#75817d;font-size:13px;margin-top:4px}
+.card{background:white;margin:14px 16px;border-radius:20px;padding:18px;box-shadow:0 4px 18px #00000008}
+.cal{text-align:center}.cal .big{font-size:38px;font-weight:850}.muted{color:#7a8581}.bar{height:9px;background:#e8eeeb;border-radius:99px;overflow:hidden;margin:10px 0}.fill{height:100%;background:#20b486;border-radius:99px}
+.macros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.macro{padding:11px;border-radius:13px;background:#f4f7f5;text-align:center}.macro b{display:block;font-size:17px}.macro span{font-size:11px;color:#7a8581}
+.meal{padding:4px 0}.mealhead{display:flex;justify-content:space-between;align-items:center}.meal h3{margin:8px 0;font-size:17px}.plus{border:0;background:#e5f7f0;color:#138c66;width:34px;height:34px;border-radius:50%;font-size:22px}
+.food{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid #edf0ef}.food .name{font-weight:650}.food small{color:#7b8581}.kcal{font-weight:750}.del{border:0;background:none;color:#b3bbb8;font-size:18px}
+.exdone{width:30px;height:30px;border-radius:50%;border:2px solid #d7e5df;background:#fff;color:#fff;font-weight:900;font-size:15px;cursor:pointer;transition:all .15s ease;flex-shrink:0}.exdone.done{background:#20b486;border-color:#20b486;box-shadow:0 3px 10px #20b48655}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:520px;width:100%;height:68px;background:#fff;border-top:1px solid #e9edeb;display:flex;justify-content:space-around;align-items:center}.bottom button{border:0;background:none;color:#65716d;font-weight:650}.bottom .active{color:#15966d}.backbtn{border:0;background:#eef5f1;color:#168b67;width:38px;height:38px;border-radius:12px;font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;pointer-events:none;transition:.18s}.backbtn.show{visibility:visible;opacity:1;pointer-events:auto}.bottom.hide-on-scroll{transform:translate(-50%,120%)}
+.streak-overlay{display:none;position:fixed;inset:0;background:rgba(8,18,14,.72);z-index:80;align-items:center;justify-content:center;padding:22px}.streak-overlay.show{display:flex}.streak-modal{width:min(420px,100%);background:#fff;border-radius:28px;padding:26px 20px 22px;text-align:center;box-shadow:0 20px 70px #0005;overflow:hidden;position:relative}.streak-modal .celebrate-broc{width:96px;height:96px;object-fit:cover;border-radius:24px;margin:0 auto 8px}.streak-modal h2{font-size:27px;margin:4px 0 2px}.streak-modal .streak-number{font-size:62px;font-weight:900;line-height:1;color:#ef7d19;margin:8px 0 2px}.flame{font-size:68px;display:inline-block;animation:flamePop 1s ease-in-out infinite alternate;filter:drop-shadow(0 8px 8px #ef7d1940)}@keyframes flamePop{0%{transform:translateY(4px) scale(.92) rotate(-3deg)}100%{transform:translateY(-5px) scale(1.08) rotate(3deg)}}.spark{position:absolute;font-size:20px;animation:sparkFly 1.8s ease-out forwards;pointer-events:none}@keyframes sparkFly{0%{opacity:0;transform:translate(0,25px) scale(.4)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.2)}}.sharegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.sharebtn{border:0;background:#eef7f3;color:#158c67;border-radius:13px;padding:12px;font-weight:800;cursor:pointer}.greeting{font-size:13px;color:#68766f;margin-top:2px}.name-pill{font-weight:800;color:#17221e}.name-field input{font-size:18px}.share-note{font-size:11px;color:#77837f;line-height:1.4;margin-top:8px}
+.streak{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#fff8df,#ffffff);border:1px solid #f2e5b7}.mascot{width:58px;height:58px;border-radius:18px;background:#dff7ed;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:inset 0 -5px 0 #c7eadc}.streak h3{margin:0 0 3px;font-size:16px}.streak p{margin:0;color:#69756f;font-size:12px}.calendar{padding:16px}.calhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.calhead button{border:0;background:#eef5f1;border-radius:10px;width:34px;height:34px;font-size:20px}.month{font-weight:800;text-transform:capitalize}.week,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.week div{text-align:center;font-size:10px;color:#8a9490;font-weight:700}.day{min-height:44px;border:0;border-radius:12px;background:#f5f7f6;font-size:13px;position:relative;color:#26332e}.day.empty{background:transparent}.day.logged{background:#dff7ed;color:#117957;font-weight:800}.day.today{outline:2px solid #20b486}.day.selected{box-shadow:inset 0 0 0 2px #15966d}.dot{width:5px;height:5px;border-radius:50%;background:#20b486;position:absolute;bottom:6px;left:50%;transform:translateX(-50%)}.historytitle{display:flex;justify-content:space-between;align-items:center}.historytitle h3{margin:0}.summaryline{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #edf0ef}.summaryline:last-child{border-bottom:0}.smallbtn{border:0;background:#eef5f1;color:#168b67;border-radius:10px;padding:8px 10px;font-weight:700}
+.overlay{display:none;position:fixed;inset:0;background:#0008;z-index:10;align-items:flex-end}.sheet{background:#fff;width:100%;max-width:520px;margin:auto;border-radius:24px 24px 0 0;padding:20px;max-height:90vh;overflow:auto}.sheet h2{margin-top:0}.field{margin:10px 0}.field label{display:block;font-size:12px;color:#68736f;margin-bottom:5px}.field input,.field select{width:100%;padding:13px;border:1px solid #dce4e0;border-radius:12px;font-size:16px;background:#fff}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{width:100%;padding:14px;border:0;border-radius:13px;background:#20b486;color:#fff;font-weight:800;font-size:15px;margin-top:8px}.btn.alt{background:#eef3f0;color:#31413b}.search{padding:13px!important}.results{margin-top:8px}.result{padding:12px;border:1px solid #e3e9e6;border-radius:13px;margin:7px 0;cursor:pointer}.result b{display:block}.tag{font-size:12px;color:#75817d}.note{font-size:11px;color:#77837f;line-height:1.45;margin-top:12px}
+
+.onboard{display:none;position:fixed;inset:0;background:#f5f8f6;z-index:20;overflow:auto}.onboard.show{display:block}.onbox{max-width:520px;margin:auto;min-height:100vh;padding:28px 20px 35px}.welcome{text-align:center;padding:12px 0 18px}.broccoli{position:relative;width:104px;height:104px;margin:0 auto 12px}.broc-head{position:absolute;left:18px;top:30px;width:68px;height:57px;background:#35a968;border-radius:45% 45% 40% 40%;box-shadow:0 -17px 0 4px #47b879, -18px -5px 0 1px #42b273, 18px -5px 0 1px #42b273}.broc-body{position:absolute;left:28px;top:68px;width:48px;height:28px;background:#f5a623;border-radius:0 0 22px 22px}.eye{position:absolute;top:53px;width:11px;height:15px;background:#17372a;border-radius:50%;z-index:2}.eye.l{left:38px}.eye.r{right:38px}.mouth{position:absolute;left:48px;top:72px;width:18px;height:9px;border-bottom:3px solid #17372a;border-radius:50%;z-index:2}.step{display:none}.step.active{display:block}.progress{height:7px;background:#e2ebe6;border-radius:99px;margin:8px 0 22px}.progress i{display:block;height:100%;background:#20b486;border-radius:99px;width:20%;transition:.2s}.onbox h1{font-size:28px;margin:5px 0 7px}.onbox .sub{color:#68766f;margin:0 0 18px;line-height:1.45}.choicegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{border:1px solid #dce6e1;background:#fff;border-radius:15px;padding:14px;text-align:left;font-weight:750;cursor:pointer}.choice.sel{border:2px solid #20b486;background:#ecfaf5}.onactions{display:flex;gap:10px;margin-top:20px}.onactions .btn{margin:0}.info{background:#edf8f4;border-radius:14px;padding:12px;font-size:12px;line-height:1.45;color:#486057;margin-top:12px}.metric{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric .cardmini{background:#fff;border:1px solid #e0e8e4;border-radius:15px;padding:14px}.cardmini b{display:block;font-size:22px}.goalbox{background:#fff;border-radius:18px;padding:16px;border:1px solid #e1e8e5;margin-top:12px}.profilehero{display:flex;gap:12px;align-items:center;justify-content:space-between}.profilehead{display:flex;gap:12px;align-items:center;min-width:0}.sheetclose{flex:0 0 auto;width:40px;height:40px;border:0;border-radius:12px;background:#eef5f1;color:#168b67;font-size:25px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer}.sheetclose:active{transform:scale(.96)}.profilebroc{width:64px;height:64px;transform:scale(.62);transform-origin:center}.profilebroc .broc-body{display:none}.goalgreen{color:#138b67;font-weight:800}.customgoal{background:#f3faf7;border:1px solid #d7eee5;border-radius:15px;padding:14px;margin-top:12px}.customgoal .row{align-items:end}.customgoal input{width:100%;padding:12px;border:1px solid #d7e3de;border-radius:11px;font-size:16px;background:#fff}.customgoal .hint{font-size:11px;color:#6f7c76;line-height:1.4;margin-top:8px}.editday{display:flex;gap:8px;margin-top:12px}.editday button{flex:1}.calnote{font-size:11px;color:#78847f;margin-top:10px}.splash{position:fixed;inset:0;background:#f5f8f6;z-index:50;display:flex;align-items:center;justify-content:center;transition:opacity .35s}.splash.hide{opacity:0;pointer-events:none}.splashbox{text-align:center;padding:30px}.splashbox h1{font-size:34px;margin:8px 0 5px}.splashbox p{margin:0;color:#718078}.splashline{width:150px;height:5px;background:#e1ebe6;border-radius:99px;margin:22px auto 0;overflow:hidden}.splashline i{display:block;width:35%;height:100%;background:#20b486;border-radius:99px;animation:loadline 1.1s infinite ease-in-out}@keyframes loadline{0%{transform:translateX(-120%)}100%{transform:translateX(430%)}}.activitydesc{font-size:11px;color:#7a8581;margin-top:4px}.broccoli-img{width:104px;height:104px;object-fit:contain;display:block;margin:0 auto 12px;border-radius:24px}.profilebroc-img{width:64px;height:64px;object-fit:cover;border-radius:18px;display:block}.mascot-img{width:58px;height:58px;object-fit:cover;border-radius:18px}
+
+.scanhero{background:linear-gradient(135deg,#eafaf4,#ffffff);border:1px solid #d9eee6;display:flex;align-items:center;gap:14px;cursor:pointer}.scanicon{width:58px;height:58px;border-radius:18px;background:#20b486;color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 8px 18px #20b4862b}.scanhero h3{margin:0 0 4px}.scanhero p{margin:0;color:#6f7b76;font-size:12px;line-height:1.35}.scan-sheet{padding-bottom:28px}.scan-preview{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:18px;background:#eef3f0;display:none}.scan-preview.show{display:block}.scan-empty{border:1px dashed #cfdcd6;border-radius:18px;padding:28px 16px;text-align:center;background:#f8faf9;color:#718078}.scan-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.scan-status{background:#f1f7f4;border-radius:13px;padding:11px;font-size:12px;color:#4e625a;margin-top:12px}.analysis-card{background:#f7fbf9;border:1px solid #dcebe4;border-radius:16px;padding:14px;margin-top:14px}.confidence{height:7px;background:#e3ece8;border-radius:99px;overflow:hidden;margin-top:7px}.confidence i{display:block;height:100%;background:#20b486;border-radius:99px}.scan-disclaimer{font-size:11px;line-height:1.45;color:#718078;margin-top:10px}.editable-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.editable-grid .field{margin:5px 0}.camera-input{display:none}.model-note{font-size:11px;color:#7a8581;margin-top:8px}.scan-warning{margin-top:10px;padding:10px;border-radius:12px;background:#fff8e8;border:1px solid #f2dfae;color:#735b20;font-size:12px;line-height:1.35}.scan-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 10px;background:#f5fbf8;border:1px solid #dceee6;border-radius:18px;margin-top:14px}.green-spinner{width:52px;height:52px;border:5px solid #d9eee6;border-top-color:#20b486;border-right-color:#20b486;border-radius:50%;animation:nutriSpin .8s linear infinite;margin-bottom:12px}.scan-loading b{font-size:16px}.scan-loading p{font-size:12px;color:#6d7b75;margin:5px 0 0;line-height:1.4}.calc-loading{text-align:center;padding:18px 10px 8px}.calc-loading .green-spinner{margin:0 auto 12px}.success-check{width:62px;height:62px;border-radius:50%;background:#20b486;color:#fff;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900;margin:0 auto 10px;animation:successPop .55s ease-out}.success-title{color:#128861;font-weight:900;font-size:18px;margin:0}.result-reveal{animation:resultReveal .55s ease-out both}@keyframes nutriSpin{to{transform:rotate(360deg)}}@keyframes successPop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes resultReveal{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:none}}
+
+.auth-overlay{position:fixed;inset:0;background:#f5f8f6;z-index:100;overflow:auto}.authbox{max-width:520px;margin:auto;min-height:100vh;padding:42px 20px 35px;display:flex;flex-direction:column;justify-content:center}.auth-logo{width:92px;height:92px;object-fit:cover;border-radius:24px;margin:0 auto 14px}.authbox h1{text-align:center;margin:0 0 7px;font-size:30px}.auth-sub{text-align:center;color:#6d7a74;margin:0 0 24px;line-height:1.45}.auth-card{background:#fff;border:1px solid #e0e8e4;border-radius:22px;padding:18px;box-shadow:0 10px 35px #00000008}.auth-title{font-size:20px;font-weight:850;margin:0 0 14px}.password-wrap{position:relative}.password-wrap input{padding-right:52px}.eye-btn{position:absolute;right:7px;top:7px;width:42px;height:42px;border:0;background:#eef5f1;border-radius:11px;color:#168b67;font-size:20px;cursor:pointer}.auth-switch{text-align:center;margin:18px 0 0;color:#69766f;font-size:13px}.auth-link{border:0;background:none;color:#138b67;font-weight:850;font-size:13px;cursor:pointer}.auth-error{background:#fff0f0;border:1px solid #f0caca;color:#a33a3a;border-radius:12px;padding:10px;font-size:12px;margin-bottom:10px;display:none}.auth-note{font-size:10px;color:#82908a;line-height:1.45;text-align:center;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="splash" id="splash"><div class="splashbox"><img class="broccoli-img" src="assets/broccoli.png" alt="Mascota Nutri, brócoli con lentes"><h1>Nutri</h1><p id="splashText">Guardando tu progreso...</p><div class="splashline"><i></i></div></div></div>
+<div class="app">
+<header><div style="display:flex;align-items:center;gap:10px"><button type="button" id="backBtn" class="backbtn" onclick="goBack()" aria-label="Volver">‹</button><div><div class="brand">Nutri</div><div class="date" id="today"></div><div class="greeting" id="greeting"></div></div></div></header>
+<main id="home"></main>
+<nav class="bottom">
+<button type="button" id="navHome" class="active" onclick="showHome();return false;">⌂<br><small>Inicio</small></button>
+<button type="button" id="navCalendar" aria-label="Abrir calendario" onclick="showCalendar();return false;">▦<br><small>Calendario</small></button>
+<button type="button" id="navExercise" aria-label="Abrir ejercicio" onclick="showExercise();return false;">🏃<br><small>Ejercicio</small></button>
+<button type="button" id="navProfile" onclick="openProfile();return false;">◉<br><small>Perfil</small></button>
+</nav>
+</div>
+
+
+
+<div class="auth-overlay" id="authOverlay">
+  <div class="authbox">
+    <img class="auth-logo" src="assets/broccoli.png" alt="Nutri">
+    <h1>Nutri 🥦</h1>
+    <p class="auth-sub">Inicia sesión para guardar tu perfil y tu progreso.</p>
+    <div class="auth-card" id="loginCard">
+      <h2 class="auth-title">Iniciar sesión</h2>
+      <div id="loginError" class="auth-error"></div>
+      <div class="field"><label>Correo</label><input id="loginUser" type="email" maxlength="120" autocomplete="username" placeholder="tucorreo@ejemplo.com"></div>
+      <div class="field"><label>Contraseña</label><div class="password-wrap"><input id="loginPass" type="password" maxlength="80" autocomplete="current-password" placeholder="Tu contraseña"><button class="eye-btn" type="button" onclick="togglePassword('loginPass',this)" aria-label="Mostrar contraseña">👁</button></div></div>
+      <button class="btn" onclick="loginAccount()">Iniciar sesión</button>
+      <div class="auth-switch">¿No tienes una cuenta? <button class="auth-link" onclick="showRegister()">Regístrate</button></div>
+    </div>
+    <div class="auth-card" id="registerCard" style="display:none">
+      <h2 class="auth-title">Crear cuenta</h2>
+      <div id="registerError" class="auth-error"></div>
+      <div class="field"><label>Correo</label><input id="regUser" type="email" maxlength="120" autocomplete="username" placeholder="tucorreo@ejemplo.com"></div>
+      <div class="field"><label>Contraseña</label><div class="password-wrap"><input id="regPass" type="password" maxlength="80" autocomplete="new-password" placeholder="Crea una contraseña"><button class="eye-btn" type="button" onclick="togglePassword('regPass',this)" aria-label="Mostrar contraseña">👁</button></div></div>
+      <div class="field"><label>Confirmar contraseña</label><div class="password-wrap"><input id="regPass2" type="password" maxlength="80" autocomplete="new-password" placeholder="Repite tu contraseña"><button class="eye-btn" type="button" onclick="togglePassword('regPass2',this)" aria-label="Mostrar contraseña">👁</button></div></div>
+      <button class="btn" onclick="registerAccount()">Crear cuenta</button>
+      <div class="auth-switch">¿Ya tienes una cuenta? <button class="auth-link" onclick="showLogin()">Inicia sesión</button></div>
+    </div>
+    <div class="auth-note">Tu cuenta y tus datos se guardan de forma segura en la nube — puedes entrar desde cualquier teléfono o navegador y verás siempre lo mismo.</div>
+  </div>
+</div>
+<div class="overlay" id="scannerOverlay"><div class="sheet scan-sheet" id="scannerSheet">
+  <div class="profilehero"><div class="profilehead"><div class="scanicon" style="width:46px;height:46px;border-radius:14px;font-size:22px">📷</div><div><h2 style="margin:0">Escanear alimento</h2><div class="muted">Foto → identificación → edición → registro</div></div></div><button type="button" class="sheetclose" onclick="closeScanner()" aria-label="Cerrar escáner">×</button></div>
+  <div id="scanStart">
+    <div class="scan-empty" style="margin-top:14px"><div style="font-size:42px">🥗</div><b>Toma una foto de tu comida</b><div style="margin-top:6px;font-size:12px">Procura que el plato se vea completo y con buena luz.</div></div>
+    <div class="scan-actions"><label class="btn" style="margin:0;text-align:center;cursor:pointer">📷 Tomar foto<input id="cameraInput" class="camera-input" type="file" accept="image/*" capture="environment"></label><label class="btn alt" style="margin:0;text-align:center;cursor:pointer">🖼️ Elegir foto<input id="galleryInput" class="camera-input" type="file" accept="image/*"></label></div>
+    <div class="model-note">Nutri usa dos modelos: uno para platos y otro especializado en frutas y verduras. Si la confianza es baja, te lo indicará y podrás corregirlo antes de guardar.</div>
+  </div>
+  <div id="scanWork" style="display:none"><img id="scanPreview" class="scan-preview" alt="Foto del alimento"><div id="scanLoading" class="scan-loading" style="display:none"><div class="green-spinner"></div><b id="scanLoadingTitle">Analizando tu comida…</b><p>Estamos revisando el plato y buscando alimentos y complementos.</p></div><div id="scanStatus" class="scan-status">Preparando análisis…</div><div id="scanResult"></div></div>
+</div></div>
+<div class="onboard" id="onboard"><div class="onbox">
+  <div class="welcome"><img class="broccoli-img" src="assets/broccoli.png" alt="Mascota Nutri, brócoli con lentes"><h1>¡Hola! Soy Nutri 🥦</h1><p class="sub">Antes de empezar necesito algunos datos para calcular una meta nutricional aproximada y personalizada.</p></div>
+  <div class="progress"><i id="onprog"></i></div>
+  <div class="step active" data-step="1"><h2>Primero, cuéntame de ti</h2><div class="field name-field"><label>¿Cómo te llamas?</label><input id="on_name" type="text" maxlength="40" autocomplete="name" placeholder="Ej. Anonymous"></div><div class="field"><label>Edad</label><input id="on_age" type="number" min="1" max="120" placeholder="Ej. 25"></div><div class="field"><label>Sexo usado para la estimación energética</label><div class="choicegrid"><button class="choice" data-group="sex" data-value="female" onclick="pick(this)">Mujer</button><button class="choice" data-group="sex" data-value="male" onclick="pick(this)">Hombre</button></div></div><div class="onactions"><button class="btn" onclick="nextOn(2)">Continuar</button></div></div>
+  <div class="step" data-step="2"><h2>Tu cuerpo</h2><div class="metric"><div class="cardmini"><label>Altura (cm)</label><input id="on_height" type="number" step="0.1" placeholder="165"></div><div class="cardmini"><label>Peso (kg)</label><input id="on_weight" type="number" step="0.1" placeholder="60"></div></div><div class="onactions"><button class="btn alt" onclick="nextOn(1)">Atrás</button><button class="btn" onclick="nextOn(3)">Continuar</button></div></div>
+  <div class="step" data-step="3"><h2>¿Qué tanto te mueves?</h2><div id="activityChoices" class="choicegrid"></div><div class="onactions"><button class="btn alt" onclick="nextOn(2)">Atrás</button><button class="btn" onclick="nextOn(4)">Continuar</button></div></div>
+  <div class="step" data-step="4"><h2>¿Qué entrenas?</h2><div class="field"><label>Tipo de entrenamiento principal</label><select id="on_training"><option value="Fuerza">Fuerza / gimnasio</option><option value="Cardio">Cardio / correr / bici</option><option value="Deporte">Deporte (fútbol, básquet, etc.)</option><option value="Mixto">Mixto</option><option value="Ninguno">No entreno actualmente</option></select></div><div class="field"><label>¿Cuántos días por semana?</label><select id="on_days"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option></select></div><div class="onactions"><button class="btn alt" onclick="nextOn(3)">Atrás</button><button class="btn" onclick="nextOn(5)">Continuar</button></div></div>
+  <div class="step" data-step="5"><h2>¿Cuál es tu objetivo?</h2><div class="choicegrid"><button class="choice" data-group="goaltype" data-value="lose" onclick="pick(this)">Bajar grasa</button><button class="choice" data-group="goaltype" data-value="maintain" onclick="pick(this)">Mantener peso</button><button class="choice" data-group="goaltype" data-value="gain" onclick="pick(this)">Ganar peso</button><button class="choice" data-group="goaltype" data-value="recomp" onclick="pick(this)">Recomposición</button></div><div class="info">La meta de calorías será una estimación, no una prescripción médica. El gasto real puede variar entre personas.</div><div class="onactions"><button class="btn alt" onclick="nextOn(4)">Atrás</button><button class="btn" onclick="finishOnboarding()">Calcular mi objetivo</button></div></div>
+  <div class="step" data-step="6"><div class="welcome"><img class="broccoli-img" style="transform:scale(.8)" src="assets/broccoli.png" alt="Mascota Nutri, brócoli con lentes"><h1>¡Listo! 🥦</h1><p class="sub">Nutri calculó una referencia usando tus datos.</p></div><div id="onResult"></div><div class="onactions"><button class="btn" onclick="closeOnboarding()">Empezar a registrar</button></div></div>
+</div></div>
+
+<div class="overlay" id="overlay"><div class="sheet" id="sheet"></div></div>
+<div class="streak-overlay" id="streakOverlay" aria-hidden="true"><div class="streak-modal" id="streakModal"><div id="streakSparks"></div><img class="celebrate-broc" src="assets/broccoli.png" alt="Brócoli Nutri"><div class="flame">🔥</div><div class="streak-number" id="celebrateNumber">1</div><h2>¡Racha desbloqueada!</h2><p class="muted" id="celebrateText">Primer día registrado.</p><button type="button" class="btn" onclick="closeStreakCelebration()">¡Vamos!</button></div></div>
+<div class="streak-overlay" id="exerciseCelebration" aria-hidden="true"><div class="streak-modal" id="exerciseCelebrationModal"><div id="exerciseSparks"></div><div class="flame">🎉</div><h2>¡Felicidades!</h2><p class="muted">Terminaste tu rutina de hoy. ¿Hiciste algo más que quieras agregar?</p><button type="button" class="btn" onclick="closeExerciseCelebration();openRoutineEditor()">+ Agregar algo que hice hoy</button><button type="button" class="btn alt" style="margin-top:8px" onclick="closeExerciseCelebration()">Ya terminé, gracias</button></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+// ====== CONFIGURACIÓN ======
+// Estos dos valores no son secretos: se usan del lado del navegador a propósito.
+// La seguridad real la da Row Level Security en Supabase (ver supabase/schema.sql).
+const SUPABASE_URL = 'https://xvncydijzordzwrilqai.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_tLpsLGTQfdAGX5Il611y7w_i3DIuWrx';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let scanFile=null, scanObjectUrl=null, scanBusy=false;
+const DB=[
+["Huevo","1 pieza",72,6.3,0.4,4.8],["Huevo","2 piezas",144,12.6,0.8,9.6],["Claras de huevo","100 g",52,11,0.7,0.2],
+["Pechuga de pollo","100 g",165,31,0,3.6],["Pollo cocido","100 g",165,31,0,3.6],["Pollo a la plancha","100 g",165,31,0,3.6],["Muslo de pollo","100 g",209,26,0,11],["Pollo asado","100 g",190,29,0,8],
+["Carne de res magra","100 g",217,26,0,12],["Carne molida de res","100 g",250,26,0,17],["Bistec de res","150 g",330,39,0,18],["Cerdo","100 g",242,27,0,14],["Lomo de cerdo","100 g",196,29,0,8],
+["Pescado blanco","100 g",120,26,0,2],["Salmón","150 g",310,34,0,18],["Atún en agua","100 g",116,26,0,1],["Camarón","100 g",99,24,0.2,0.3],["Tilapia","100 g",128,26,0,2.7],
+["Arroz blanco cocido","100 g",130,2.7,28.2,0.3],["Arroz blanco cocido","1 taza",205,4.3,44.5,0.5],["Arroz integral cocido","1 taza",216,5,45,1.8],["Pasta cocida","1 taza",220,8,43,1.3],["Espagueti","1 taza",220,8,43,1.3],["Avena","40 g",152,5.2,27,2.8],["Granola","40 g",180,4,29,6],
+["Tortilla de maíz","1 pieza",52,1.4,10.7,0.7],["Tortilla de harina","1 pieza",140,4,24,4],["Pan de caja","1 rebanada",75,3,13,1],["Pan integral","1 rebanada",80,4,14,1.2],["Bolillo","1 pieza",140,5,28,1],["Bagel","1 pieza",270,10,53,2],
+["Sándwich","1 pieza",350,20,38,13],["Sándwich de jamón","1 pieza",330,20,35,12],["Sándwich de pollo","1 pieza",400,30,38,14],["Sándwich de atún","1 pieza",380,25,35,17],["Sándwich de queso","1 pieza",420,15,32,27],["Sándwich club","1 pieza",520,30,45,25],["Hamburguesa","1 pieza",520,28,40,28],["Hot dog","1 pieza",290,11,24,17],
+["Frijoles cocidos","100 g",127,8.7,22.8,0.5],["Lentejas cocidas","1 taza",230,18,40,0.8],["Garbanzos cocidos","1 taza",269,14.5,45,4.2],["Edamame","1 taza",190,18,14,8],
+["Queso cottage","100 g",98,11,3.4,4.3],["Queso cottage","1/2 taza",110,12,4,5],["Queso panela","50 g",100,9,1.5,6.5],["Queso manchego","30 g",120,7,0.5,10],["Queso mozzarella","30 g",85,6,1,6],
+["Yogur natural","170 g",107,9,12,2.5],["Yogur griego natural","170 g",100,17,6,0.7],["Leche entera","1 taza",149,7.7,11.7,8],["Leche descremada","1 taza",83,8.3,12,0.2],
+["Manzana","1 pieza mediana",95,0.5,25,0.3],["Plátano","1 pieza mediana",105,1.3,27,0.4],["Naranja","1 pieza mediana",62,1.2,15.4,0.2],["Pera","1 pieza mediana",101,0.6,27,0.2],["Mango","1 taza",99,1.4,25,0.6],["Uvas","1 taza",104,1.1,27,0.2],["Fresa","1 taza",49,1,12,0.5],["Piña","1 taza",82,0.9,22,0.2],["Sandía","1 taza",46,0.9,12,0.2],["Papaya","1 taza",55,0.9,14,0.2],["Kiwi","1 pieza",42,0.8,10,0.4],["Guayaba","1 pieza",37,1.4,8,0.5],["Melón","1 taza",54,1.3,13,0.3],
+["Aguacate","1/2 pieza",120,1.5,6.4,11],["Lechuga","1 taza",5,0.5,1,0.1],["Tomate","1 pieza mediana",22,1.1,4.8,0.2],["Cebolla","1/4 pieza",16,0.4,3.7,0.1],["Limón","1/2 pieza",6,0.2,2,0.1],["Cilantro","1/4 taza",1,0.1,0.2,0],["Jalapeño","1 pieza",4,0.1,0.9,0.1],["Chile","1 pieza",18,0.8,4,0.2],["Pepino","1/2 pieza",15,0.7,3.6,0.1],["Zanahoria","1 pieza mediana",25,0.6,6,0.1],["Brócoli","1 taza",55,3.7,11.2,0.6],["Coliflor","1 taza",27,2.1,5,0.3],["Espinaca","1 taza",7,0.9,1.1,0.1],["Calabacita","1 taza",27,2,5,0.6],["Pimiento morrón","1/2 taza",18,0.6,4.2,0.2],["Maíz","1/2 taza",77,2.7,17,1.2],["Papa cocida","1 pieza mediana",161,4.3,37,0.2],["Camote cocido","1 pieza mediana",112,2,26,0.1],["Champiñones","1 taza",15,2.2,2.3,0.2],
+["Nueces","30 g",196,4.6,4.1,19.6],["Almendras","30 g",174,6.4,6.1,15],["Cacahuates","30 g",170,7,5,14],["Pistaches","30 g",170,6,8,13],["Anacardos","30 g",165,5.4,9,13],["Semillas de chía","30 g",146,5,12,9],["Semillas de girasol","30 g",175,6,6,15],["Crema de cacahuate","2 cucharadas",190,7,7,16],
+["Sopa de verduras","1 taza",90,3,15,2],["Sopa de pollo","1 taza",120,12,8,4],["Sopa de pollo con verduras","1 taza",150,14,12,5],["Sopa de tomate","1 taza",90,2,15,3],["Sopa de lentejas","1 taza",180,10,28,4],["Sopa de tortilla","1 taza",220,8,25,9],["Sopa de fideo","1 taza",180,5,30,5],["Caldo de pollo","1 taza",100,12,5,3],
+["Ensalada verde","1 plato",80,3,10,3],["Ensalada de pollo","1 plato",320,35,12,15],["Ensalada de atún","1 plato",280,28,10,14],["Guacamole","100 g",160,2,9,14],["Salsa mexicana","1/2 taza",35,1.5,7,0.2],["Pico de gallo","1/2 taza",30,1,6,0.2],
+["Pizza","2 rebanadas",560,24,60,24],["Tacos de pollo","3 piezas",450,35,42,15],["Tacos de carne","3 piezas",510,30,42,24],["Quesadilla","1 pieza",280,12,25,15],["Quesadilla de pollo","2 piezas",450,28,35,22],["Burrito de pollo","1 pieza",550,35,65,18],["Burrito de desayuno","1 pieza",450,20,45,20],["Ceviche","1 taza",180,25,12,3],["Pasta con pollo","1 plato",520,35,60,14],["Pollo con arroz","1 plato",500,38,55,12],
+["Mayonesa","1 cucharada",94,0,0.1,10],["Mostaza","1 cucharada",10,0.6,0.7,0.6],["Kétchup","1 cucharada",20,0.2,5,0],["Aceite de oliva","1 cucharada",119,0,0,13.5],["Mantequilla","1 cucharada",102,0.1,0,11.5],["Miel","1 cucharada",64,0,17,0],["Azúcar","1 cucharadita",16,0,4,0],
+["Proteína en polvo","1 scoop",120,24,3,1.5],["Barra de proteína","1 pieza",200,20,20,7],["Chocolate oscuro","30 g",170,2,13,12],["Palomitas","3 tazas",93,3,19,1],["Galletas","3 piezas",160,2,22,7],["Pan dulce","1 pieza",280,5,40,11],["Hotcakes","3 piezas",350,9,55,10],["Waffles","2 piezas",300,8,40,12],
+["Agua de jamaica","1 taza",40,0,10,0],["Café con leche","1 taza",80,4,8,3],["Café negro","1 taza",2,0.3,0,0],["Jugo de naranja","1 taza",112,1.7,26,0.5],["Refresco","355 ml",150,0,39,0],["Agua de coco","1 taza",46,2,9,0],
+["Plátano con crema de cacahuate","1 pieza",250,5,32,12],["Plátano al horno con canela","1 pieza",140,1.5,32,0.5],["Pan de plátano","1 rebanada",220,3,35,8],["Plátanos fritos","1 taza",280,2,45,11],["Crepas de plátano","2 piezas",320,6,48,11],["Malteada de plátano","1 vaso",290,9,45,8],["Helado de plátano casero","1 taza",160,3,36,0.5],["Plátano con chocolate","1 pieza",210,2,35,9],["Avena con plátano","1 taza",230,7,42,4],
+["Gelatina","1 taza",100,2,24,0],["Flan","1 rebanada",220,6,32,7],["Arroz con leche","1 taza",240,6,44,4],["Pay de queso","1 rebanada",320,5,28,21],["Brownie","1 pieza",280,4,35,15],["Muffin","1 pieza",340,5,48,15],["Paleta de hielo","1 pieza",80,0,20,0],["Nieve de frutas","1 taza",180,1,42,0.5],["Churros","3 piezas",280,4,36,14],["Donas","1 pieza",260,3,31,14],["Cheesecake de fresa","1 rebanada",340,6,32,21],["Pastel de chocolate","1 rebanada",350,5,45,17],["Crepas con Nutella","2 piezas",380,7,50,17],["Yogur con granola y fruta","1 taza",260,10,38,8]
+];
+
+let currentAccount=null; // aquí vive el user_id de Supabase Auth una vez logueado
+function togglePassword(id,btn){const el=document.getElementById(id);if(!el)return;el.type=el.type==='password'?'text':'password';btn.textContent=el.type==='password'?'👁':'🙈'}
+function authError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block'}
+function clearAuthErrors(){['loginError','registerError'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'})}
+function showRegister(){clearAuthErrors();document.getElementById('loginCard').style.display='none';document.getElementById('registerCard').style.display='block'}
+function showLogin(){clearAuthErrors();document.getElementById('registerCard').style.display='none';document.getElementById('loginCard').style.display='block'}
+
+// Carga los datos del usuario desde Supabase (la nube), no del navegador.
+// Así, sin importar en qué dispositivo o navegador entre, ve siempre lo mismo.
+async function loadAccountData(){
+  const {data,error}=await sb.from('user_data').select('*').eq('user_id',currentAccount).maybeSingle();
+  if(error){
+    // Sin conexión o falla temporal: usamos la última copia guardada en este navegador
+    // para no dejar la app en blanco. En cuanto vuelva a haber red, save() vuelve a sincronizar.
+    console.error('Error cargando datos de la nube, usando caché local',error);
+    try{
+      const cache=JSON.parse(localStorage.getItem('nutri_cache_'+currentAccount)||'null');
+      const cacheEx=JSON.parse(localStorage.getItem('nutri_cache_ex_'+currentAccount)||'null');
+      const cacheCf=JSON.parse(localStorage.getItem('nutri_cache_cf_'+currentAccount)||'null');
+      profile=cache?.profile||null;log=cache?.log||{};progress=cache?.progress||[];
+      routine=cacheEx?.routine||[];exerciseLog=cacheEx?.exerciseLog||{};customFoods=cacheCf||[];
+      aiRecipes=[];aiMealPlans=[];aiRoutines=[];
+    }catch(e){profile=null;log={};progress=[];routine=[];exerciseLog={};customFoods=[];aiRecipes=[];aiMealPlans=[];aiRoutines=[]}
+    normalizeProfile();return;
+  }
+  if(!data){ // primera vez de este usuario: crea su fila vacía
+    profile=null;log={};progress=[];routine=[];exerciseLog={};customFoods=[];aiRecipes=[];aiMealPlans=[];aiRoutines=[];
+    await sb.from('user_data').insert({user_id:currentAccount});
+  }else{
+    profile=data.profile&&Object.keys(data.profile).length?data.profile:null;
+    log=data.log||{};progress=data.progress||[];routine=data.routine||[];exerciseLog=data.exercise_log||{};customFoods=data.custom_foods||[];
+    aiRecipes=data.ai_recipes||[];aiMealPlans=data.ai_meal_plans||[];aiRoutines=data.ai_routines||[];
+  }
+  normalizeProfile();
+}
+async function registerAccount(){
+  clearAuthErrors();
+  const btn=document.querySelector('#registerCard .btn');
+  try{
+    const email=document.getElementById('regUser').value.trim(),p=document.getElementById('regPass').value,p2=document.getElementById('regPass2').value;
+    if(!email||!email.includes('@'))return authError('registerError','Escribe un correo válido.');
+    if(p.length<6)return authError('registerError','La contraseña debe tener al menos 6 caracteres.');
+    if(p!==p2)return authError('registerError','Las contraseñas no coinciden.');
+    if(btn){btn.disabled=true;btn.textContent='Creando...'}
+    const {data,error}=await sb.auth.signUp({email,password:p});
+    if(error)return authError('registerError',error.message==='User already registered'?'Ese correo ya tiene una cuenta. Intenta iniciar sesión.':'No se pudo crear la cuenta: '+error.message);
+    if(!data.session){
+      // El proyecto de Supabase pide confirmar el correo antes de dejar entrar.
+      authError('registerError','Te enviamos un correo de confirmación. Ábrelo y luego inicia sesión aquí.');
+      showLogin();
+      return;
+    }
+    currentAccount=data.user.id;
+    await loadAccountData();
+    document.getElementById('authOverlay').style.display='none';
+    startAfterAuth();
+  }catch(e){
+    console.error('Error al crear cuenta',e);
+    authError('registerError','No se pudo crear la cuenta. Revisa tu conexión e intenta de nuevo.');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Crear cuenta'}
+  }
+}
+async function loginAccount(){
+  clearAuthErrors();
+  const btn=document.querySelector('#loginCard .btn');
+  try{
+    const email=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;
+    if(!email||!p)return authError('loginError','Escribe tu correo y contraseña.');
+    if(btn){btn.disabled=true;btn.textContent='Entrando...'}
+    const {data,error}=await sb.auth.signInWithPassword({email,password:p});
+    if(error)return authError('loginError',error.message==='Invalid login credentials'?'Correo o contraseña incorrectos.':'No se pudo iniciar sesión: '+error.message);
+    currentAccount=data.user.id;
+    await loadAccountData();
+    document.getElementById('authOverlay').style.display='none';
+    startAfterAuth();
+  }catch(e){
+    console.error('Error al iniciar sesión',e);
+    authError('loginError','No se pudo iniciar sesión. Revisa tu conexión e intenta de nuevo.');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Iniciar sesión'}
+  }
+}
+async function logoutAccount(){
+  await sb.auth.signOut();
+  currentAccount=null;profile=null;log={};progress=[];routine=[];exerciseLog={};customFoods=[];
+  close();
+  document.getElementById('authOverlay').style.display='block';
+  showLogin();
+}
+function startAfterAuth(){normalizeProfile();const hasProfile=!!(profile&&profile.name&&profile.age);if(hasProfile){showHome();document.getElementById('splashText').textContent='Cargando tu progreso...';setTimeout(()=>{document.getElementById('splash')?.classList.add('hide');maybeCelebrateStreak()},450)}else{document.getElementById('onboard').classList.add('show');showOnStep(1);document.getElementById('splashText').textContent='Vamos a preparar tu perfil...';setTimeout(()=>document.getElementById('splash')?.classList.add('hide'),450)}}
+async function bootAuth(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){
+    currentAccount=session.user.id;
+    await loadAccountData();
+    startAfterAuth();
+    return true;
+  }
+  document.getElementById('authOverlay').style.display='block';
+  document.getElementById('splashText').textContent='Inicia sesión o crea tu cuenta';
+  return false;
+}
+
+function readJSON(key,fallback){try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):fallback}catch(e){console.warn("Nutri: dato guardado inválido",key,e);return fallback}}
+let profile=null;
+let log={};
+let progress=[];
+let routine=[];
+let exerciseLog={};
+let customFoods=[];
+let aiRecipes=[], aiMealPlans=[], aiRoutines=[];
+// Los datos del usuario viven en almacenamiento del navegador y NO dependen de la versión del ZIP.
+// Esta marca permite futuras migraciones sin volver a mostrar el onboarding por una actualización.
+const NUTRI_DATA_VERSION=1;
+if(profile && typeof profile==="object") localStorage.setItem("nutri_data_version",String(NUTRI_DATA_VERSION));
+let selectedDate=null;
+let calendarDate=new Date();
+normalizeProfile();
+function pad(n){return String(n).padStart(2,"0")}
+function dateKey(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+const key=()=>dateKey(new Date());
+// Todo lo que antes iba a localStorage ahora va a Supabase (la nube). Además guardamos
+// una copia de respaldo en este navegador (caché), para que si en un momento no hay
+// internet, la app siga mostrando lo último conocido en vez de quedar en blanco.
+function save(){
+  if(!currentAccount)return;
+  try{localStorage.setItem('nutri_cache_'+currentAccount,JSON.stringify({profile,log,progress}))}catch(e){}
+  sb.from('user_data').update({profile,log,progress}).eq('user_id',currentAccount).then(({error})=>{if(error)console.error('No se pudo guardar en la nube (se reintentará en el próximo cambio)',error)});
+}
+function saveExercise(){
+  if(!currentAccount)return;
+  try{localStorage.setItem('nutri_cache_ex_'+currentAccount,JSON.stringify({routine,exerciseLog}))}catch(e){}
+  sb.from('user_data').update({routine,exercise_log:exerciseLog}).eq('user_id',currentAccount).then(({error})=>{if(error)console.error('No se pudo guardar la rutina en la nube',error)});
+}
+function saveCustomFoods(){
+  if(!currentAccount)return;
+  try{localStorage.setItem('nutri_cache_cf_'+currentAccount,JSON.stringify(customFoods))}catch(e){}
+  sb.from('user_data').update({custom_foods:customFoods}).eq('user_id',currentAccount).then(({error})=>{if(error)console.error('No se pudo guardar alimentos personalizados',error)});
+}
+// Guarda lo que la IA generó (receta, plan o rutina) para que quede disponible después,
+// sin tener que volver a pedírselo. Cada lista guarda lo más reciente primero, tope 20.
+function saveAIRecipe(item){
+  if(!currentAccount)return;
+  aiRecipes=[{...item,id:'ai'+Date.now().toString(36),created:new Date().toISOString()}, ...aiRecipes].slice(0,20);
+  sb.from('user_data').update({ai_recipes:aiRecipes}).eq('user_id',currentAccount).then(({error})=>{if(error)console.error('No se pudo guardar la receta',error)});
+}
+function saveAIMealPlan(item){
+  if(!currentAccount)return;
+  aiMealPlans=[{...item,id:'ai'+Date.now().toString(36),created:new Date().toISOString()}, ...aiMealPlans].slice(0,20);
+  sb.from('user_data').update({ai_meal_plans:aiMealPlans}).eq('user_id',currentAccount).then(({error})=>{if(error)console.error('No se pudo guardar el plan',error)});
+}
+function saveAIRoutineData(item){
+  if(!currentAccount)return;
+  aiRoutines=[{...item,id:'ai'+Date.now().toString(36),created:new Date().toISOString()}, ...aiRoutines].slice(0,20);
+  sb.from('user_data').update({ai_routines:aiRoutines}).eq('user_id',currentAccount).then(({error})=>{if(error)console.error('No se pudo guardar la rutina',error)});
+}
+function saveCheckin(weight){let k=key();let existing=progress.find(x=>x.date===k);if(existing)existing.weight=weight;else progress.push({date:k,weight});progress.sort((a,b)=>a.date.localeCompare(b.date));save()}
+function items(k=selectedDate||key()){return log[k]||[]}
+function totals(arr=items()){return arr.reduce((a,x)=>{a.k+=+x.k||0;a.p+=+x.p||0;a.c+=+x.c||0;a.f+=+x.f||0;return a},{k:0,p:0,c:0,f:0})}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function setNav(active){document.querySelectorAll('.bottom button').forEach(b=>b.classList.remove('active'));document.getElementById(active)?.classList.add('active')}
+function getStreak(){let d=new Date(),n=0;while(true){let k=dateKey(d);if(!(log[k]&&log[k].length))break;n++;d.setDate(d.getDate()-1)}return n}
+function mascotText(streak){if(streak===0)return "Empieza hoy";if(streak===1)return "¡Primer día registrado!";if(streak<7)return "¡Vas con todo!";if(streak<14)return "¡Ya traes una gran racha!";if(streak<30)return "¡Tu brócoli está orgulloso!";return "¡Racha legendaria! 🥦"}
+function isStreakMilestone(n){return n===1||n===3||n===7||(n>=15&&n%15===0)}
+function maybeCelebrateStreak(){
+  const k=key(), arr=log[k]||[], streak=getStreak();
+  if(!arr.length || !isStreakMilestone(streak)) return;
+  const shown=JSON.parse(localStorage.getItem("nutri_streak_celebrations")||"{}");
+  if(shown[k]===streak)return;
+  shown[k]=streak; localStorage.setItem("nutri_streak_celebrations",JSON.stringify(shown));
+  document.getElementById('celebrateNumber').textContent=streak;
+  document.getElementById('celebrateText').textContent=streak===1?'Primer día registrado.':`¡${streak} días seguidos!`;
+  const box=document.getElementById('streakSparks'); box.innerHTML='';
+  for(let i=0;i<18;i++){const s=document.createElement('span');s.className='spark';s.textContent=i%3===0?'🔥':'✦';s.style.left=(8+Math.random()*84)+'%';s.style.top=(8+Math.random()*58)+'%';s.style.setProperty('--dx',(Math.random()*180-90)+'px');s.style.setProperty('--dy',(-40-Math.random()*130)+'px');s.style.animationDelay=(Math.random()*.45)+'s';box.appendChild(s)}
+  const ov=document.getElementById('streakOverlay');ov.classList.add('show');ov.setAttribute('aria-hidden','false');
+}
+function closeStreakCelebration(){const ov=document.getElementById('streakOverlay');ov.classList.remove('show');ov.setAttribute('aria-hidden','true')}
+function monthStats(year,month){
+  const days=new Date(year,month+1,0).getDate(); let logged=0,total=0;
+  for(let d=1;d<=days;d++){const k=dateKey(new Date(year,month,d)),arr=log[k]||[];if(arr.length){logged++;total+=totals(arr).k}}
+  return {days,logged,total,average:logged?Math.round(total/logged):0};
+}
+function shareText(title,text){
+  if(navigator.share){navigator.share({title,text}).catch(()=>{});return true}
+  return false;
+}
+function shareToday(){
+  const t=totals(log[key()]||[]), name=profile?.name?` de ${profile.name}`:'';
+  const text=`Nutri${name} — ${new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})}\n🔥 ${Math.round(t.k)} kcal / ${profile?.goal||0} kcal\n🥩 Proteína: ${t.p.toFixed(1)} g\n🍚 Carbohidratos: ${t.c.toFixed(1)} g\n🥑 Grasas: ${t.f.toFixed(1)} g\n🔥 Racha: ${getStreak()} días`;
+  if(!shareText('Mi resumen de Nutri',text)) alert(text+'\n\nEn este navegador todavía no está disponible el botón nativo de compartir.');
+}
+async function shareMonth(){
+  const y=calendarDate.getFullYear(),m=calendarDate.getMonth(),st=monthStats(y,m),month=new Date(y,m,1).toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+  const text=`Nutri${profile?.name?` de ${profile.name}`:''} — ${month}\n📅 Días registrados: ${st.logged}/${st.days}\n🔥 Calorías registradas: ${Math.round(st.total)} kcal\n📊 Promedio por día registrado: ${st.average} kcal`;
+  if(navigator.share && navigator.canShare){
+    try{
+      const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;const c=canvas.getContext('2d');
+      c.fillStyle='#f5f8f6';c.fillRect(0,0,1080,1350);c.fillStyle='#ffffff';c.roundRect(55,55,970,1240,38);c.fill();
+      c.fillStyle='#15966d';c.font='800 54px system-ui';c.fillText('Nutri',90,140);
+      c.fillStyle='#17221e';c.font='700 34px system-ui';c.fillText(profile?.name?`Calendario de ${profile.name}`:'Mi calendario',90,195);
+      c.fillStyle='#65716d';c.font='500 30px system-ui';c.fillText(month,90,240);
+      const labels=['L','M','M','J','V','S','D'];let x0=95,y0=315,cw=125,ch=110,g=10;
+      c.font='700 24px system-ui';c.fillStyle='#7a8581';labels.forEach((l,i)=>c.fillText(l,x0+i*(cw+g)+48,y0));
+      const first=new Date(y,m,1),last=new Date(y,m+1,0),start=(first.getDay()+6)%7;
+      for(let d=1;d<=last.getDate();d++){const idx=start+d-1,row=Math.floor(idx/7),col=idx%7,k=dateKey(new Date(y,m,d)),arr=log[k]||[],tk=Math.round(totals(arr).k);const x=x0+col*(cw+g),yy=y0+28+row*(ch+g);c.fillStyle=arr.length?'#dff7ed':'#f2f5f3';c.roundRect(x,yy,cw,ch,18);c.fill();c.fillStyle='#17221e';c.font='700 26px system-ui';c.fillText(String(d),x+14,yy+34);if(arr.length){c.fillStyle='#15966d';c.font='700 22px system-ui';c.fillText(tk+' kcal',x+14,yy+70);c.fillStyle='#20b486';c.beginPath();c.arc(x+cw-20,yy+20,6,0,Math.PI*2);c.fill()}}
+      c.fillStyle='#17221e';c.font='700 30px system-ui';c.fillText(`🔥 ${Math.round(st.total)} kcal registradas`,90,1115);c.fillStyle='#65716d';c.font='500 26px system-ui';c.fillText(`📅 ${st.logged} días registrados · promedio ${st.average} kcal`,90,1160);c.fillText(`🔥 Racha actual: ${getStreak()} días`,90,1205);
+      const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));const file=new File([blob],`nutri-${y}-${String(m+1).padStart(2,'0')}.png`,{type:'image/png'});
+      if(navigator.canShare({files:[file]})){await navigator.share({title:`Mi calendario de Nutri — ${month}`,text,files:[file]});return;}
+    }catch(e){}
+  }
+  if(!shareText(`Mi calendario de Nutri — ${month}`,text)) alert(text+'\n\nEn este navegador todavía no está disponible el botón nativo de compartir.');
+}
+
+const ACT=[['sedentary','Poco activa','Poco o ningún ejercicio','1.20'],['light','Ligera','Ejercicio ligero 1–3 días/semana','1.375'],['moderate','Moderada','Ejercicio moderado 3–5 días/semana','1.55'],['high','Alta','Ejercicio intenso 6–7 días/semana','1.725'],['veryhigh','Muy alta','Entrenamiento muy intenso + actividad física alta','1.90']];
+let onboarding={step:1,name:"",sex:null,goaltype:null};
+function pick(el){let g=el.dataset.group;document.querySelectorAll(`.choice[data-group="${g}"]`).forEach(x=>x.classList.remove('sel'));el.classList.add('sel');onboarding[g]=el.dataset.value}
+function nextOn(n){if(n===2&&!validStep1())return;if(n===3&&!validStep2())return;if(n===4&&!onboarding.activity)return;if(n===5&&!validStep4())return;showOnStep(n)}
+function showOnStep(n){document.querySelectorAll('.step').forEach(x=>x.classList.remove('active'));document.querySelector(`.step[data-step="${n}"]`)?.classList.add('active');onboarding.step=n;document.getElementById('onprog').style.width=Math.min(100,(n/6)*100)+'%';}
+function validStep1(){let name=document.getElementById('on_name').value.trim();if(!name){alert('Escribe tu nombre para personalizar Nutri.');return false}let age=+document.getElementById('on_age').value;if(age<18||age>120){alert('Por ahora Nutri está configurada para adultos de 18 años o más, porque la estimación energética usa una fórmula para adultos.');return false}if(!onboarding.sex){alert('Selecciona una opción para continuar.');return false}return true}
+function validStep2(){let h=+document.getElementById('on_height').value,w=+document.getElementById('on_weight').value;if(h<100||h>250||w<25||w>400){alert('Revisa tu altura y peso.');return false}return true}
+function validStep4(){let d=+document.getElementById('on_days').value;return true}
+function calcProfile(){let age=+document.getElementById('on_age').value,h=+document.getElementById('on_height').value,w=+document.getElementById('on_weight').value,activity=onboarding.activity,goaltype=onboarding.goaltype||'maintain';let mult=+ACT.find(a=>a[0]===activity)[3];let bmr=onboarding.sex==='female'?(10*w+6.25*h-5*age-161):(10*w+6.25*h-5*age+5);let tdee=bmr*mult;let goal=tdee;if(goaltype==='lose')goal=tdee*.85;else if(goaltype==='gain')goal=tdee*1.10;else if(goaltype==='recomp')goal=tdee*.95;goal=Math.round(goal/10)*10;
+  // Piso de seguridad: nunca sugerir automáticamente por debajo de un mínimo clínico general,
+  // aunque el % de déficit calculado dé menos. Si se aplica, se avisa en pantalla.
+  const safeFloor=onboarding.sex==='female'?1200:1500;
+  let goalFloorApplied=false;
+  if(goal<safeFloor){goal=safeFloor;goalFloorApplied=true}
+  let bmi=w/Math.pow(h/100,2);let name=document.getElementById('on_name').value.trim();return {name,age,sex:onboarding.sex,height:h,weight:w,activity,training:document.getElementById('on_training').value,days:+document.getElementById('on_days').value,goaltype,bmr:Math.round(bmr),tdee:Math.round(tdee),goal,goalEstimated:goal,goalCustom:false,goalFloorApplied,bmi:+bmi.toFixed(1),created:new Date().toISOString()}}
+function bmiLabel(b){if(profile.age<20)return 'IMC calculado; en menores de 20 años se interpreta con percentiles por edad y sexo.';if(b<18.5)return 'Bajo peso';if(b<25)return 'Rango de peso saludable';if(b<30)return 'Sobrepeso';return 'Obesidad'}
+function normalizeProfile(){
+  if(!profile)return;
+  if(typeof profile.goalEstimated!=="number") profile.goalEstimated=profile.goal;
+  if(typeof profile.goalCustom!=="boolean") profile.goalCustom=false;
+  if(typeof profile.name!=="string") profile.name="";
+}
+function saveCustomGoal(){
+  const input=document.getElementById("customGoalInput");
+  const value=Math.round(+input.value);
+  if(!Number.isFinite(value)||value<800||value>10000){alert("Introduce una meta entre 800 y 10,000 kcal al día. Si esta meta fue indicada por un profesional, usa la cifra que te haya dado.");return}
+  normalizeProfile();
+  profile.goal=value;
+  profile.goalCustom=true;
+  save();
+  openProfile(true);
+}
+function restoreEstimatedGoal(){
+  normalizeProfile();
+  profile.goal=profile.goalEstimated;
+  profile.goalCustom=false;
+  save();
+  openProfile(true);
+}
+async function finishOnboarding(){
+  if(!onboarding.goaltype){alert('Elige un objetivo.');return}
+  profile=calcProfile();
+  saveCheckin(profile.weight);
+  showOnStep(6);
+  const result=document.getElementById('onResult');
+  result.innerHTML=`<div class="calc-loading"><div class="green-spinner"></div><b>Calculando y estimando tus datos…</b><p class="muted" style="margin-top:6px">Nutri está preparando tus calorías, metabolismo, gasto diario y objetivo.</p></div>`;
+  await new Promise(r=>setTimeout(r,1700));
+  const bmiText=profile.age<20?'Para menores de 20 años el IMC no se clasifica con los rangos de adultos.':bmiLabel(profile.bmi);
+  const floorNote=profile.goalFloorApplied?`<div class="info result-reveal">⚠️ Tu déficit calculado quedó por debajo de un mínimo general de seguridad, así que ajustamos tu meta a ${profile.goal} kcal. Comer menos de esto de forma sostenida puede afectar tu salud — si tu objetivo real requiere menos, te recomendamos hacerlo con supervisión de un nutriólogo.</div>`:'';
+  result.innerHTML=`<div class="calc-loading result-reveal"><div class="success-check">✓</div><p class="success-title">¡Se calculó correctamente!</p><p class="muted" style="font-size:12px;margin:5px 0 14px">Tu referencia nutricional personalizada ya está lista.</p></div><div class="metric result-reveal"><div class="cardmini"><span class="muted">IMC</span><b data-count="${profile.bmi}" data-decimals="1">0</b><small>${esc(bmiText)}</small></div><div class="cardmini"><span class="muted">Objetivo diario</span><b data-count="${profile.goal}">0 kcal</b><small>Referencia aproximada</small></div><div class="cardmini"><span class="muted">Gasto estimado</span><b data-count="${profile.tdee}">0 kcal</b><small>TDEE estimado</small></div><div class="cardmini"><span class="muted">Metabolismo basal</span><b data-count="${profile.bmr}">0 kcal</b><small>Estimación BMR</small></div></div><div class="goalbox result-reveal"><b>Tu objetivo: ${goalLabel(profile.goaltype)}</b><p class="muted" style="margin:7px 0 0">Nutri usará esta meta para comparar lo que registres cada día.</p></div>${floorNote}<div class="info result-reveal">Los cálculos se basan en fórmulas poblacionales y tus datos introducidos. No pueden conocer exactamente tu gasto energético real. El IMC es una medida de cribado y no diagnostica por sí sola tu salud.</div>`;
+  document.querySelectorAll('#onResult [data-count]').forEach(el=>{
+    const target=Number(el.dataset.count), decimals=Number(el.dataset.decimals||0), start=performance.now(), duration=900;
+    function tick(now){const t=Math.min(1,(now-start)/duration), eased=1-Math.pow(1-t,3), value=target*eased;el.textContent=(decimals?value.toFixed(decimals):Math.round(value))+(el.textContent.includes('kcal')?' kcal':'');if(t<1)requestAnimationFrame(tick)}
+    requestAnimationFrame(tick);
+  });
+  save();
+}
+function goalLabel(g){return ({lose:'Bajar grasa',maintain:'Mantener peso',gain:'Ganar peso',recomp:'Recomposición'})[g]||g}
+function closeOnboarding(){document.getElementById('onboard').classList.remove('show');showHome()}
+function openOnboarding(){onboarding={step:1,name:profile?.name||"",sex:profile?.sex||null,goaltype:profile?.goaltype||null};document.getElementById('onboard').classList.add('show');if(profile){document.getElementById('on_name').value=profile.name||"";document.getElementById('on_age').value=profile.age;document.getElementById('on_height').value=profile.height;document.getElementById('on_weight').value=profile.weight;document.getElementById('on_days').value=profile.days;document.getElementById('on_training').value=profile.training;let act=document.querySelector(`.choice[data-group="activity"][data-value="${profile.activity}"]`);if(act)pick(act);let sex=document.querySelector(`.choice[data-group="sex"][data-value="${profile.sex}"]`);if(sex)pick(sex);let goal=document.querySelector(`.choice[data-group="goaltype"][data-value="${profile.goaltype}"]`);if(goal)pick(goal)}showOnStep(1)}
+function initActivity(){document.getElementById('activityChoices').innerHTML=ACT.map(a=>`<button class="choice" data-group="activity" data-value="${a[0]}" onclick="pick(this)"><b>${a[1]}</b><div class="activitydesc">${a[2]}</div></button>`).join('')}
+function syncHistory(view, replace=false){
+ const current=history.state?.view;
+ if(current===view && !replace)return;
+ const state={view};
+ if(replace) history.replaceState(state,"",location.href);
+ else history.pushState(state,"",location.href);
+ updateBackButton(view);
+}
+function updateBackButton(view=history.state?.view||'home'){
+ const b=document.getElementById('backBtn');
+ if(!b)return;
+ b.classList.toggle('show',view!=='home');
+}
+function goBack(){
+ if(document.getElementById('onboard').classList.contains('show'))return;
+ if(document.getElementById('overlay').style.display==='flex'){
+   if(history.state?.view==='profile') history.back(); else close();
+   return;
+ }
+ if(history.length>1 && history.state?.view!=='home') history.back(); else showHome();
+}
+function showHome(fromHistory=false){
+ if(!fromHistory)syncHistory('home');
+ selectedDate=null;setNav('navHome');
+ document.getElementById("today").textContent=new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long"});document.getElementById('greeting').textContent=profile?.name?`Hola, ${profile.name} 👋`:'';
+ if(!profile){openOnboarding();return} let t=totals(log[key()]||[]), pct=Math.min(100,t.k/profile.goal*100), streak=getStreak();
+ let html=`<section class="card streak"><div class="mascot"><img class="mascot-img" src="assets/broccoli.png" alt="Mascota Nutri"></div><div><h3>Racha de registro: ${streak} ${streak===1?'día':'días'} 🔥</h3><p>${mascotText(streak)} Tu progreso se guarda en la nube, en tu cuenta.</p></div></section>`;
+ html+=`<section class="card"><div class="historytitle"><div><h3 style="margin:0 0 4px">Compartir</h3><div class="muted" style="font-size:12px">Comparte tus calorías o tu resumen mensual.</div></div></div><div class="sharegrid"><button class="sharebtn" onclick="shareToday()">🔥 Resumen de hoy</button><button class="sharebtn" onclick="shareMonth()">📅 Este mes</button></div></section>`;
+ html+=`<section class="card scanhero" onclick="openScanner()"><div class="scanicon">📷</div><div><h3>Escanear alimento</h3><p>Toma una foto y Nutri identificará el plato y preparará una estimación editable.</p></div><span style="margin-left:auto;font-size:24px;color:#15966d">›</span></section>`;
+ html+=`<section class="card"><div class="historytitle"><div><h3 style="margin:0 0 4px">✨ Asistente con IA</h3><div class="muted" style="font-size:12px">Recetas, planes de alimentación, rutinas y análisis, generados para ti.</div></div></div><div class="sharegrid"><button class="sharebtn" onclick="openAIRecipe()">🍳 Recetas</button><button class="sharebtn" onclick="openAIMealPlan()">🗓️ Plan semanal</button><button class="sharebtn" onclick="openAIRoutine()">💪 Rutina IA</button><button class="sharebtn" onclick="openAIProgress()">📊 Mi progreso</button></div></section>`;
+ html+=`<section class="card"><div class="historytitle"><div><h3 style="margin:0 0 4px">📅 Tu calendario</h3><div class="muted" style="font-size:12px">Consulta lo que registraste cada día.</div></div><button class="smallbtn" onclick="showCalendar()">Abrir calendario</button></div></section>`;
+ let latest=progress.length?progress[progress.length-1]:null; if(latest){html+=`<section class="card"><div class="historytitle"><h3>Tu progreso</h3><button class="smallbtn" onclick="openProfile()">Ver perfil</button></div><div class="summaryline"><span>Peso registrado</span><b>${latest.weight} kg</b></div><div class="summaryline"><span>Días con registro</span><b>${Object.values(log).filter(a=>a&&a.length).length}</b></div><div class="summaryline"><span>Última actualización</span><b>${new Date(latest.date+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'})}</b></div></section>`}
+ html+=`<section class="card cal"><div class="muted">Calorías de hoy</div><div class="big">${Math.round(t.k)} <small class="muted">/ ${profile.goal} kcal</small></div><div class="bar"><div class="fill" style="width:${pct}%"></div></div><div class="macros"><div class="macro"><b>${t.p.toFixed(1)}g</b><span>Proteína</span></div><div class="macro"><b>${t.c.toFixed(1)}g</b><span>Carbohidratos</span></div><div class="macro"><b>${t.f.toFixed(1)}g</b><span>Grasas</span></div></div></section>`;
+ ["Desayuno","Comida","Cena","Snacks"].forEach(m=>{let arr=(log[key()]||[]).filter(x=>x.meal===m);html+=`<section class="card meal"><div class="mealhead"><h3>${m} <span class="muted">${Math.round(arr.reduce((a,x)=>a+x.k,0))} kcal</span></h3><button class="plus" onclick="openAdd('${m}')">+</button></div>${arr.map((x,i)=>`<div class="food"><div><div class="name">${esc(x.name)}</div><small>${esc(x.portion)} · P ${(+x.p).toFixed(1)}g · C ${(+x.c).toFixed(1)}g · G ${(+x.f).toFixed(1)}g</small></div><div><span class="kcal">${Math.round(x.k)}</span><button class="del" onclick="removeFood(${i},'${m}')">×</button></div></div>`).join("")}</section>`});
+ document.getElementById("home").innerHTML=html;
+}
+function showCalendar(fromHistory=false){
+  if(!fromHistory)syncHistory('calendar');
+  selectedDate = selectedDate || key();
+  setNav('navCalendar');
+  document.getElementById('overlay').style.display='none';
+  document.getElementById('onboard').classList.remove('show');
+  try {
+    renderCalendar();
+    window.scrollTo({top:0,behavior:'smooth'});
+  } catch(err) {
+    console.error(err);
+    document.getElementById('home').innerHTML = `<section class="card"><h2>Calendario</h2><p class="muted">Hubo un problema al mostrar el calendario. Tus registros siguen guardados.</p><button class="btn" onclick="showCalendar()">Intentar de nuevo</button></section>`;
+  }
+}
+function showExercise(fromHistory=false){
+  if(!fromHistory)syncHistory('exercise');
+  setNav('navExercise');
+  document.getElementById('overlay').style.display='none';
+  document.getElementById('onboard').classList.remove('show');
+  const k=key();
+  const doneToday=exerciseLog[k]||[];
+  let html='';
+  if(!routine.length){
+    html=`<section class="card" style="text-align:center;padding:34px 20px"><div style="font-size:40px;margin-bottom:8px">🏃</div><h3 style="margin:6px 0">Aún no tienes una rutina</h3><p class="muted" style="font-size:13px">Créala una vez y ve marcando cada ejercicio conforme lo completes, cada día.</p><button class="btn" style="margin-top:12px" onclick="openRoutineEditor()">+ Crear rutina</button></section>`;
+  }else{
+    const pct=Math.round((doneToday.length/routine.length)*100);
+    html=`<section class="card cal"><div class="muted">Rutina de hoy</div><div class="big">${doneToday.length} <small class="muted">/ ${routine.length} ejercicios</small></div><div class="bar"><div class="fill" style="width:${pct}%"></div></div></section>`;
+    html+=`<section class="card"><div class="historytitle"><h3 style="margin:0">Tus ejercicios</h3><button class="smallbtn" onclick="openRoutineEditor()">✏️ Editar rutina</button></div>`;
+    html+=routine.map((name,i)=>{
+      const isDone=doneToday.includes(name);
+      return `<div class="food"><div><div class="name">${esc(name)}</div></div><button type="button" class="exdone${isDone?' done':''}" onclick="toggleExerciseDone(${i})" aria-label="Marcar ${esc(name)} como completado">${isDone?'✓':''}</button></div>`;
+    }).join('');
+    html+='</section>';
+  }
+  document.getElementById('home').innerHTML=html;
+}
+function openRoutineEditor(){window.__routineTemp=routine.slice();renderRoutineEditor();document.getElementById('overlay').style.display='flex'}
+function renderRoutineEditor(){
+  const items=window.__routineTemp||[];
+  document.getElementById('sheet').innerHTML=`<h2>Tu rutina</h2><p class="muted" style="font-size:12px">Agrega los ejercicios que quieras seguir cada día (ej. Brazo, Cardio, Caminadora, Piernas...).</p><div id="routineList">${items.map((x,i)=>`<div class="food"><div><div class="name">${esc(x)}</div></div><button type="button" class="del" onclick="removeRoutineItem(${i})">×</button></div>`).join('')||'<div class="muted" style="padding:8px 0">Sin ejercicios todavía.</div>'}</div><div class="field" style="margin-top:10px"><label>Nuevo ejercicio</label><input id="newExName" placeholder="Ej. Caminadora" onkeydown="if(event.key==='Enter'){addRoutineItem();event.preventDefault()}"></div><button type="button" class="btn alt" onclick="addRoutineItem()">+ Agregar</button><button type="button" class="btn" id="saveRoutineBtn" style="margin-top:10px" onclick="saveRoutine()">Guardar rutina</button><button type="button" class="btn alt" onclick="closeProfile()">Cancelar</button>`;
+  document.getElementById('newExName')?.focus();
+}
+function addRoutineItem(){const inp=document.getElementById('newExName');const v=(inp?.value||'').trim();if(!v)return;window.__routineTemp.push(v);renderRoutineEditor()}
+function removeRoutineItem(i){window.__routineTemp.splice(i,1);renderRoutineEditor()}
+async function saveRoutine(){
+  const btn=document.getElementById('saveRoutineBtn');
+  // Si quedó texto sin agregar en el campo "Nuevo ejercicio", lo sumamos antes de guardar
+  // para que no se pierda solo por no haber tocado "+ Agregar".
+  const inp=document.getElementById('newExName');
+  const pending=(inp?.value||'').trim();
+  if(pending)window.__routineTemp.push(pending);
+  if(!window.__routineTemp||!window.__routineTemp.length){
+    alert('Agrega al menos un ejercicio antes de guardar (escribe el nombre y toca "+ Agregar").');
+    return;
+  }
+  if(btn){btn.disabled=true;btn.textContent='Creando tu rutina…'}
+  await new Promise(r=>setTimeout(r,550));
+  routine=(window.__routineTemp||[]).slice();
+  saveExercise();
+  closeProfile();
+  showExercise();
+}
+function toggleExerciseDone(i){
+  const name=routine[i];if(!name)return;
+  const k=key();
+  const arr=exerciseLog[k]?exerciseLog[k].slice():[];
+  const idx=arr.indexOf(name);
+  const wasIncomplete=arr.length<routine.length;
+  if(idx>=0)arr.splice(idx,1);else arr.push(name);
+  exerciseLog[k]=arr;
+  saveExercise();
+  showExercise();
+  if(idx<0 && wasIncomplete && arr.length===routine.length){
+    celebrateRoutineDone();
+  }
+}
+function celebrateRoutineDone(){
+  const box=document.getElementById('exerciseSparks'); if(box){box.innerHTML='';
+    for(let i=0;i<18;i++){const s=document.createElement('span');s.className='spark';s.textContent=i%3===0?'🎉':'✦';s.style.left=(8+Math.random()*84)+'%';s.style.top=(8+Math.random()*58)+'%';s.style.setProperty('--dx',(Math.random()*180-90)+'px');s.style.setProperty('--dy',(-40-Math.random()*130)+'px');s.style.animationDelay=(Math.random()*.45)+'s';box.appendChild(s)}
+  }
+  const ov=document.getElementById('exerciseCelebration');ov.classList.add('show');ov.setAttribute('aria-hidden','false');
+}
+function closeExerciseCelebration(){const ov=document.getElementById('exerciseCelebration');ov.classList.remove('show');ov.setAttribute('aria-hidden','true')}
+function renderCalendar(){
+  const y=calendarDate.getFullYear(), m=calendarDate.getMonth();
+  const first=new Date(y,m,1), last=new Date(y,m+1,0);
+  const start=(first.getDay()+6)%7;
+  const month=calendarDate.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+  let cells='';
+  for(let i=0;i<start;i++) cells+='<div class="day empty"></div>';
+  for(let d=1;d<=last.getDate();d++){
+    const dt=new Date(y,m,d), k=dateKey(dt), arr=log[k]||[];
+    const cls='day'+(arr.length?' logged':'')+(k===key()?' today':'')+(k===selectedDate?' selected':'');
+    cells+=`<button type="button" class="${cls}" onclick="selectCalendarDay('${k}')" aria-label="${d} ${month}">${d}${arr.length?'<span class="dot"></span>':''}</button>`;
+  }
+  while((start+last.getDate())%7) cells+='<div class="day empty"></div>';
+  const detail=selectedDate?calendarDetail(selectedDate):`<div class="muted">Toca un día para ver lo que consumiste.</div>`;
+  document.getElementById('home').innerHTML=`
+    <section class="card calendar">
+      <div class="calhead">
+        <button type="button" onclick="changeMonth(-1)" aria-label="Mes anterior">‹</button>
+        <div class="month">${month}</div>
+        <button type="button" onclick="changeMonth(1)" aria-label="Mes siguiente">›</button>
+      </div>
+      <div class="sharegrid" style="margin:0 0 12px"><button type="button" class="smallbtn" onclick="goCalendarToday()">Ir a hoy</button><button type="button" class="smallbtn" onclick="shareMonth()">Compartir mes</button></div>
+      <div class="week"><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
+      <div class="days">${cells}</div>
+      <div class="calnote">Los días en verde tienen alimentos registrados. Toca cualquier día para consultar sus calorías.</div>
+    </section>
+    <section class="card">${detail}</section>`;
+  document.getElementById('today').textContent='Historial nutricional';
+}
+function goCalendarToday(){calendarDate=new Date();selectedDate=key();renderCalendar()}
+function selectCalendarDay(k){selectedDate=k;renderCalendar()}
+function calendarDetail(k){
+  const arr=log[k]||[], t=totals(arr), d=new Date(k+'T12:00:00');
+  const label=d.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const foods=arr.length?arr.map(x=>`<div class="summaryline"><span>${esc(x.name)} <small class="muted">(${esc(x.meal)})</small></span><b>${Math.round(x.k)} kcal</b></div>`).join(''):'<div class="muted">No hay alimentos registrados este día.</div>';
+  return `<div class="historytitle"><h3>${label}</h3><button class="smallbtn" onclick="openAddForDate('${k}','Comida')">+ Registrar</button></div><div class="summaryline"><span>Total</span><b>${Math.round(t.k)} kcal</b></div><div class="summaryline"><span>Proteína</span><b>${t.p.toFixed(1)} g</b></div><div class="summaryline"><span>Carbohidratos</span><b>${t.c.toFixed(1)} g</b></div><div class="summaryline"><span>Grasas</span><b>${t.f.toFixed(1)} g</b></div><h3 style="margin:18px 0 8px">Alimentos</h3>${foods}`;
+}
+function useDate(k){selectedDate=k;close();window.editDate=k;showCalendar()}
+function openAddForDate(k,meal){window.editDate=k;openAdd(meal)}
+
+function changeMonth(n){calendarDate.setMonth(calendarDate.getMonth()+n);selectedDate=null;renderCalendar()}
+
+function openScanner(){
+  document.getElementById('scannerOverlay').style.display='flex';
+  document.getElementById('scanStart').style.display='block';
+  document.getElementById('scanWork').style.display='none';
+  document.getElementById('scanResult').innerHTML='';
+  document.getElementById('scanStatus').textContent='Preparando análisis…';
+}
+function closeScanner(){
+  document.getElementById('scannerOverlay').style.display='none';
+  if(scanObjectUrl){URL.revokeObjectURL(scanObjectUrl);scanObjectUrl=null}
+  scanFile=null;
+}
+async function handleScanFile(file){
+  if(!file||!file.type.startsWith('image/'))return;
+  scanFile=file;
+  if(scanObjectUrl)URL.revokeObjectURL(scanObjectUrl);
+  scanObjectUrl=URL.createObjectURL(file);
+  const preview=document.getElementById('scanPreview');
+  preview.src=scanObjectUrl;preview.classList.add('show');
+  document.getElementById('scanStart').style.display='none';
+  document.getElementById('scanWork').style.display='block';
+  await analyzeFoodPhoto();
+}
+function prettyLabel(s){return String(s).replace(/_/g,' ')}
+async function prepareScanImage(src,maxSide=1024){
+  return await new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+      const w=Math.max(1,Math.round(img.naturalWidth*scale)),h=Math.max(1,Math.round(img.naturalHeight*scale));
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      const ctx=c.getContext('2d',{alpha:false});ctx.drawImage(img,0,0,w,h);
+      resolve(c.toDataURL('image/jpeg',.82));
+    };
+    img.onerror=()=>reject(new Error('No se pudo preparar la foto'));
+    img.src=src;
+  });
+}
+// El reconocimiento de comida ahora lo hace la API de Claude (servidor), no el teléfono.
+// Esto es mucho más rápido, no descarga modelos pesados y no puede saturar la memoria
+// del celular ni reiniciar la pestaña, que era el problema del enfoque anterior.
+async function analyzeFoodPhoto(){
+  if(scanBusy)return;scanBusy=true;
+  const status=document.getElementById('scanStatus'),result=document.getElementById('scanResult'),loader=document.getElementById('scanLoading'),loaderTitle=document.getElementById('scanLoadingTitle');
+  result.innerHTML='';
+  try{
+    if(loader)loader.style.display='flex';
+    if(loaderTitle)loaderTitle.textContent='Analizando tu foto…';
+    status.textContent='Enviando la foto para identificar el platillo…';
+    const scanSrc=await prepareScanImage(scanObjectUrl,1024);
+    const resp=await fetch('/api/scan-food',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:scanSrc})});
+    if(!resp.ok){
+      const e=new Error('SCAN_API_FAILED');e.techDetail=`HTTP ${resp.status}`;throw e;
+    }
+    const data=await resp.json();
+    if(!data||!data.principal){const e=new Error('SCAN_NO_RESULT');throw e}
+    if(loader)loader.style.display='none';
+    status.textContent=`Identificación principal: ${data.principal.nombre} · confianza ${data.principal.confianza||0}%`;
+    renderScanResult(data);
+  }catch(err){
+    console.error(err);
+    if(loader)loader.style.display='none';
+    if(err&&err.message==='SCAN_API_FAILED'){
+      status.textContent='No se pudo analizar la foto.';
+      result.innerHTML=`<div class="analysis-card"><b>📸 La foto sí se recibió</b><p class="muted" style="font-size:12px;line-height:1.4">Hubo un problema conectando con el servicio de identificación. Revisa tu conexión e intenta de nuevo, o agrega el alimento manualmente.</p><p class="muted" style="font-size:10px">Detalle técnico: ${esc(err.techDetail||'')}</p><button class="btn" onclick="openCustomFromScanner()">Introducir alimento manualmente</button></div>`;
+    }else{
+      status.textContent='No pude identificar la foto automáticamente.';
+      result.innerHTML=`<div class="analysis-card"><b>📸 La foto sí se recibió</b><p class="muted" style="font-size:12px;line-height:1.4">El análisis automático no pudo obtener un resultado confiable. Esto puede ocurrir con platos muy mezclados, poca luz o alimentos difíciles de distinguir. Puedes buscar el alimento o agregarlo manualmente.</p><button class="btn" onclick="openCustomFromScanner()">Introducir alimento manualmente</button></div>`;
+    }
+  }finally{scanBusy=false}
+}
+function renderScanResult(data){
+  const base=data.principal, conf=Math.round(base.confianza||0);
+  window.scanAlternatives=data.alternativas||[];
+  window.scanDetectedComplements=data.complementos||[];
+  const alts=(data.alternativas||[]).map((x,i)=>`<button type="button" class="smallbtn" onclick="applyScanAlternative(${i})">${esc(x.nombre)} ${Math.round(x.confianza||0)}%</button>`).join(' ');
+  const caution=conf<65?'<div class="scan-warning">⚠️ La confianza no es suficiente para afirmar qué alimento es. Revisa la foto y corrige el nombre antes de guardar.</div>':'';
+  const complementHtml=(data.complementos||[]).map((m,i)=>`<div class="scan-item"><div class="scan-item-head"><div><b>${esc(m.nombre)}</b><div class="muted">Posible complemento · ${Math.round(m.confianza||0)}% confianza</div></div><label class="muted"><input class="detected-check" type="checkbox" id="comp${i}" checked> agregar</label></div><div class="editable-grid"><div class="field"><label>Porción</label><input id="compPortion${i}" value="${esc(m.porcion||'1 porción')}"></div><div class="field"><label>Calorías</label><input id="compK${i}" type="number" value="${m.kcal||0}" min="0"></div><div class="field"><label>Proteína</label><input id="compP${i}" type="number" step="0.1" value="${m.proteina||0}" min="0"></div><div class="field"><label>Carbohidratos</label><input id="compC${i}" type="number" step="0.1" value="${m.carbohidratos||0}" min="0"></div><div class="field"><label>Grasas</label><input id="compF${i}" type="number" step="0.1" value="${m.grasas||0}" min="0"></div></div><input type="hidden" id="compName${i}" value="${esc(m.nombre)}"></div>`).join('');
+  document.getElementById('scanResult').innerHTML=`<div class="analysis-card"><div style="display:flex;justify-content:space-between;gap:10px"><div><div class="muted" style="font-size:11px">Alimento principal</div><h3 style="margin:3px 0">${esc(base.nombre)}</h3></div><b>${conf}%</b></div><div class="confidence"><i style="width:${Math.min(100,conf)}%"></i></div><div class="model-note">La confianza es de identificación visual; no representa precisión de calorías ni de porción.</div>${caution}</div><div class="analysis-card"><b>Revisa y edita antes de guardar</b><div class="field"><label>Alimento principal</label><input id="scanName" value="${esc(base.nombre)}"></div><div class="field"><label>Porción</label><input id="scanPortion" value="${esc(base.porcion||'1 porción')}"></div><div class="editable-grid"><div class="field"><label>Calorías</label><input id="scanK" type="number" value="${base.kcal||0}" min="0"></div><div class="field"><label>Proteína (g)</label><input id="scanP" type="number" step="0.1" value="${base.proteina||0}" min="0"></div><div class="field"><label>Carbohidratos (g)</label><input id="scanC" type="number" step="0.1" value="${base.carbohidratos||0}" min="0"></div><div class="field"><label>Grasas (g)</label><input id="scanF" type="number" step="0.1" value="${base.grasas||0}" min="0"></div></div><div class="field"><label>¿En qué comida?</label><select id="scanMeal"><option>Desayuno</option><option selected>Comida</option><option>Cena</option><option>Snacks</option></select></div></div><div class="analysis-card"><b>🥑 Posibles complementos detectados</b><div class="model-note">La IA revisó la foto buscando otros alimentos que acompañen el plato principal. Marca lo que realmente comiste y corrige las porciones.</div><div class="scan-items">${complementHtml||'<div class="muted">No se detectaron complementos. Puedes agregarlos manualmente.</div>'}</div><button class="btn alt" style="margin-top:10px" onclick="openCustomFromScanner()">+ Agregar otro alimento</button></div><button class="btn" onclick="saveScanFood()">Guardar alimento y complementos seleccionados</button><button class="btn alt" onclick="closeScanner()">Cancelar</button><div class="analysis-card"><b>Otras posibilidades</b><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">${alts||'<span class="muted">No hay alternativas relevantes.</span>'}</div></div><div class="scan-disclaimer">La foto no permite conocer por sí sola el peso exacto, ingredientes, aceite, salsas o tamaño de la porción. Los complementos son posibilidades y todos los valores son editables.</div>`;
+}
+function applyScanAlternative(i){const alt=(window.scanAlternatives||[])[i];if(!alt)return;document.getElementById('scanName').value=alt.nombre;document.getElementById('scanPortion').value=alt.porcion||'1 porción';document.getElementById('scanK').value=alt.kcal||0;document.getElementById('scanP').value=alt.proteina||0;document.getElementById('scanC').value=alt.carbohidratos||0;document.getElementById('scanF').value=alt.grasas||0}
+function saveScanFood(){const n=document.getElementById('scanName').value.trim();if(!n){alert('Escribe el nombre del alimento.');return}const meal=document.getElementById('scanMeal').value;const k=Math.max(0,+document.getElementById('scanK').value||0),p=Math.max(0,+document.getElementById('scanP').value||0),c=Math.max(0,+document.getElementById('scanC').value||0),f=Math.max(0,+document.getElementById('scanF').value||0);addItem({name:n,portion:document.getElementById('scanPortion').value||'1 porción',k,p,c,f,meal});const comps=window.scanDetectedComplements||[];for(let i=0;i<comps.length;i++){if(!document.getElementById(`comp${i}`)?.checked)continue;const cn=document.getElementById(`compName${i}`)?.value?.trim();if(!cn)continue;addItem({name:cn,portion:document.getElementById(`compPortion${i}`)?.value||'1 porción',k:Math.max(0,+document.getElementById(`compK${i}`)?.value||0),p:Math.max(0,+document.getElementById(`compP${i}`)?.value||0),c:Math.max(0,+document.getElementById(`compC${i}`)?.value||0),f:Math.max(0,+document.getElementById(`compF${i}`)?.value||0),meal})}closeScanner()}
+function openCustomFromScanner(){closeScanner();openAdd('Comida');setTimeout(()=>openCustom('Comida'),30)}
+document.getElementById('cameraInput').addEventListener('change',e=>handleScanFile(e.target.files?.[0]));
+document.getElementById('galleryInput').addEventListener('change',e=>handleScanFile(e.target.files?.[0]));
+function openAdd(meal){
+ document.getElementById("sheet").innerHTML=`<h2>Agregar a ${meal}</h2><div class="field"><label>Buscar alimento</label><div style="display:flex;gap:8px"><input class="search" id="q" oninput="searchFood()" placeholder="Ej. huevo, arroz, pollo..." style="flex:1"><button type="button" id="micBtn" class="smallbtn" onclick="startVoiceSearch()" aria-label="Buscar por voz" title="Buscar por voz">🎤</button></div></div><div id="results"></div><div id="resultsOnline"></div><div id="resultsUsda"></div><button class="btn alt" onclick="openCustom('${meal}')">+ Crear alimento personalizado</button><div class="note">Las calorías son estimaciones de referencia. Para alimentos empacados conviene usar la etiqueta nutricional del producto.</div>`;
+ document.getElementById("overlay").style.display="flex";searchFood()
+}
+let searchDebounce=null;let onlineResults=[];let usdaResults=[];
+// TODO: reemplazar por la clave real de USDA cuando la mande el usuario (fdc.nal.usda.gov/api-key-signup.html).
+// Con DEMO_KEY funciona pero con un límite bajo (30 búsquedas/hora); con clave propia sube a 1000/hora.
+const USDA_API_KEY='bvHSIT2tstUJjHDyAhgETcisEgXeaAPnUQaHl6Oh';
+// USDA solo entiende inglés. Como no queremos depender de una API de traducción de paga,
+// traducimos palabra por palabra usando este diccionario de términos comunes de comida antes
+// de buscar — no es un traductor perfecto (frases raras pueden no traducirse bien), pero cubre
+// la enorme mayoría de búsquedas de un solo ingrediente o comida común.
+const FOOD_ES_EN={
+"pollo":"chicken","pechuga":"breast","muslo":"thigh","res":"beef","carne":"meat","cerdo":"pork","puerco":"pork","pescado":"fish","salmón":"salmon","atún":"tuna","camarón":"shrimp","camarones":"shrimp","huevo":"egg","huevos":"eggs","leche":"milk","queso":"cheese","yogur":"yogurt","mantequilla":"butter","crema":"cream",
+"arroz":"rice","pasta":"pasta","pan":"bread","tortilla":"tortilla","avena":"oats","frijoles":"beans","frijol":"bean","lentejas":"lentils","garbanzos":"chickpeas","harina":"flour",
+"manzana":"apple","plátano":"banana","platano":"banana","naranja":"orange","pera":"pear","mango":"mango","uvas":"grapes","fresa":"strawberry","fresas":"strawberries","piña":"pineapple","sandía":"watermelon","papaya":"papaya","limón":"lime","kiwi":"kiwi","durazno":"peach","ciruela":"plum",
+"lechuga":"lettuce","tomate":"tomato","jitomate":"tomato","cebolla":"onion","zanahoria":"carrot","brócoli":"broccoli","coliflor":"cauliflower","espinaca":"spinach","calabaza":"squash","calabacita":"zucchini","papa":"potato","papas":"potatoes","camote":"sweet potato","pepino":"cucumber","chile":"chili pepper","pimiento":"bell pepper","maíz":"corn","elote":"corn","aguacate":"avocado","champiñones":"mushrooms","ajo":"garlic",
+"nueces":"walnuts","almendras":"almonds","cacahuates":"peanuts","semillas":"seeds","miel":"honey","azúcar":"sugar","chocolate":"chocolate","aceite":"oil","sal":"salt",
+"sopa":"soup","caldo":"broth","ensalada":"salad","sándwich":"sandwich","hamburguesa":"hamburger","pizza":"pizza","agua":"water","jugo":"juice","café":"coffee","té":"tea"
+};
+function translateForUsda(q){
+  return q.split(/\s+/).map(w=>{
+    const clean=w.toLowerCase().replace(/[^a-záéíóúñ]/gi,'');
+    return FOOD_ES_EN[clean]||w;
+  }).join(' ');
+}
+function searchFood(){
+  let q=(document.getElementById("q")?.value||"").trim();
+  let ql=q.toLowerCase();
+  const allLocal=[...DB,...customFoods];
+  let arr=allLocal.filter(x=>x[0].toLowerCase().includes(ql));
+  document.getElementById("results").innerHTML=arr.map((x,i)=>`<div class="result" onclick="addLocalFood('${esc(x[0]).replace(/'/g,"\\'")}','${document.querySelector('#sheet h2').textContent.replace('Agregar a ','')}')"><b>${esc(x[0])}</b><span class="tag">${x[1]} · ${x[2]} kcal · P ${x[3]}g · C ${x[4]}g · G ${x[5]}g</span></div>`).join("");
+  const onlineBox=document.getElementById("resultsOnline");
+  const usdaBox=document.getElementById("resultsUsda");
+  if(!onlineBox)return;
+  onlineBox.innerHTML='';if(usdaBox)usdaBox.innerHTML='';
+  if(searchDebounce)clearTimeout(searchDebounce);
+  if(q.length<3)return;
+  // Orden de búsqueda: 1) lista local + alimentos guardados por el usuario (arriba),
+  // 2) Open Food Facts en línea (productos reales, prioriza español/México),
+  // 3) USDA en línea SOLO si Open Food Facts no encontró nada — es en inglés, por eso va al final
+  // y se muestra aparte, claramente etiquetado, para no confundir con los resultados en español.
+  searchDebounce=setTimeout(async()=>{
+    onlineBox.innerHTML='<div class="muted" style="padding:8px 0;font-size:12px">Buscando también en línea…</div>';
+    const meal=document.querySelector('#sheet h2').textContent.replace('Agregar a ','');
+    try{
+      // Open Food Facts: primero la base de México (marcas mexicanas), y si trae pocos
+      // resultados, completamos con la base mundial. Mostramos marca y, si la etiqueta
+      // trae porción, usamos la porción real del empaque en vez de "100 g".
+      const fields='code,product_name,product_name_es,brands,serving_size,serving_quantity,nutriments';
+      const offUrl=(host)=>`https://${host}.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=40&fields=${fields}`;
+      let products=[];
+      try{const r1=await fetch(offUrl('mx'));const d1=await r1.json();products=d1.products||[]}catch(e){}
+      if(products.length<10){try{const r2=await fetch(offUrl('world'));const d2=await r2.json();products=products.concat(d2.products||[])}catch(e){}}
+      const r1d=v=>Math.round((+v||0)*10)/10;
+      const seen=new Set();
+      onlineResults=products.filter(p=>{
+        const n=p.nutriments||{};const name=p.product_name_es||p.product_name;
+        if(!name||!(n['energy-kcal_100g']||n['energy-kcal_serving']))return false;
+        const k=(name+'|'+(p.brands||'')).toLowerCase();if(seen.has(k))return false;seen.add(k);return true;
+      }).slice(0,30).map(p=>{
+        const n=p.nutriments,name=p.product_name_es||p.product_name,brand=(p.brands||'').split(',')[0].trim();
+        const hasServing=n['energy-kcal_serving']&&p.serving_size;
+        return {
+          name:name+(brand?` (${brand})`:''),
+          brand,
+          portion:hasServing?p.serving_size:'100 g',
+          k:Math.round(hasServing?n['energy-kcal_serving']:n['energy-kcal_100g']),
+          p:r1d(hasServing?n['proteins_serving']:n['proteins_100g']),
+          c:r1d(hasServing?n['carbohydrates_serving']:n['carbohydrates_100g']),
+          f:r1d(hasServing?n['fat_serving']:n['fat_100g'])
+        };
+      });
+      if(!onlineResults.length){
+        onlineBox.innerHTML='<div class="muted" style="padding:8px 0;font-size:12px">Sin productos de marca para esa búsqueda.</div>';
+      }else{
+        onlineBox.innerHTML=`<div class="muted" style="padding:6px 0 2px;font-size:11px">🏷️ Productos de marca (${onlineResults.length}) · Open Food Facts</div>`+onlineResults.map((x,i)=>`<div class="result" onclick="addOnlineFood(${i},'${meal}')"><b>${esc(x.name)}</b><span class="tag">${esc(x.portion)} · ${x.k} kcal · P ${x.p}g · C ${x.c}g · G ${x.f}g</span></div>`).join('');
+      }
+      // USDA solo entra como último recurso, si Open Food Facts no encontró nada.
+      if(!onlineResults.length && usdaBox){
+        usdaBox.innerHTML='<div class="muted" style="padding:8px 0;font-size:12px">Buscando en USDA (inglés)…</div>';
+        try{
+          const uurl=`https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(translateForUsda(q))}&pageSize=6&api_key=${USDA_API_KEY}`;
+          const ures=await fetch(uurl);
+          const udata=await ures.json();
+          const getN=(f,name)=>{const n=(f.foodNutrients||[]).find(x=>x.nutrientName===name);return n?Math.round((n.value||0)*10)/10:0};
+          usdaResults=(udata.foods||[]).slice(0,6).map(f=>({
+            name:f.description,
+            portion:'100 g',
+            k:getN(f,'Energy')||0,
+            p:getN(f,'Protein')||0,
+            c:getN(f,'Carbohydrate, by difference')||0,
+            f2:getN(f,'Total lipid (fat)')||0
+          }));
+          if(!usdaResults.length){usdaBox.innerHTML='<div class="muted" style="padding:8px 0;font-size:12px">Sin resultados en USDA tampoco.</div>';}
+          else{usdaBox.innerHTML='<div class="muted" style="padding:6px 0 2px;font-size:11px">🇺🇸 Resultados de USDA (en inglés — los números son correctos, solo el nombre queda en inglés)</div>'+usdaResults.map((x,i)=>`<div class="result" onclick="addUsdaFood(${i},'${meal}')"><b>${esc(x.name)}</b><span class="tag">${x.portion} · ${x.k} kcal · P ${x.p}g · C ${x.c}g · G ${x.f2}g</span></div>`).join('');}
+        }catch(e){console.warn('USDA no disponible',e);usdaBox.innerHTML='<div class="muted" style="padding:8px 0;font-size:12px">No se pudo buscar en USDA.</div>'}
+      }
+    }catch(e){
+      console.warn('Open Food Facts no disponible',e);
+      onlineBox.innerHTML='<div class="muted" style="padding:8px 0;font-size:12px">No se pudo buscar en línea (revisa tu conexión).</div>';
+    }
+  },550);
+}
+function addOnlineFood(i,meal){const x=onlineResults[i];if(!x)return;
+  // Recordamos el producto de marca en "mis alimentos" para que la próxima vez salga al instante.
+  if(!customFoods.some(c=>c[0]===x.name&&c[1]===x.portion)){customFoods.push([x.name,x.portion,x.k,x.p,x.c,x.f]);saveCustomFoods()}
+  addItem({name:x.name,portion:x.portion,k:x.k,p:x.p,c:x.c,f:x.f,meal})}
+function addUsdaFood(i,meal){const x=usdaResults[i];if(!x)return;addItem({name:x.name,portion:x.portion,k:x.k,p:x.p,c:x.c,f:x.f2,meal})}
+function addLocalFood(name,meal){const x=[...DB,...customFoods].find(y=>y[0]===name);if(!x)return;addItem({name:x[0],portion:x[1],k:x[2],p:x[3],c:x[4],f:x[5],meal})}
+function startVoiceSearch(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const btn=document.getElementById('micBtn');
+  if(!SR){
+    if(btn){btn.textContent='⚠️';setTimeout(()=>{if(btn)btn.textContent='🎤'},1800)}
+    alert('Tu navegador no soporta búsqueda por voz. Intenta con Chrome en Android.');
+    return;
+  }
+  const rec=new SR();
+  rec.lang='es-MX';rec.interimResults=false;rec.maxAlternatives=1;
+  if(btn){btn.textContent='🔴';btn.disabled=true}
+  rec.onresult=(e)=>{
+    const text=e.results?.[0]?.[0]?.transcript||'';
+    const inp=document.getElementById('q');
+    if(inp){inp.value=text;searchFood()}
+  };
+  rec.onerror=()=>{if(btn){btn.textContent='🎤';btn.disabled=false}};
+  rec.onend=()=>{if(btn){btn.textContent='🎤';btn.disabled=false}};
+  try{rec.start()}catch(e){if(btn){btn.textContent='🎤';btn.disabled=false}}
+}
+function addDB(i,meal){let x=DB[i];addItem({name:x[0],portion:x[1],k:x[2],p:x[3],c:x[4],f:x[5],meal})}
+function addItem(x){let k=window.editDate||key();log[k]=log[k]||[];log[k].push(x);window.editDate=null;save();close();k===key()?showHome():showCalendar();if(k===key())setTimeout(maybeCelebrateStreak,120)}
+function openCustom(meal){document.getElementById("sheet").innerHTML=`<h2>Crear alimento</h2><div class="field"><label>Nombre</label><input id="cn" placeholder="Ej. Tacos de pollo"></div><div class="row"><div class="field"><label>Porción</label><input id="cp" placeholder="100 g"></div><div class="field"><label>Calorías</label><input id="ck" type="number" placeholder="250"></div></div><div class="row"><div class="field"><label>Proteína (g)</label><input id="cpr" type="number" step=".1"></div><div class="field"><label>Carbohidratos (g)</label><input id="cc" type="number" step=".1"></div></div><div class="field"><label>Grasas (g)</label><input id="cf" type="number" step=".1"></div><label class="muted" style="display:flex;align-items:center;gap:7px;margin:10px 0"><input type="checkbox" id="saveForNextTime" checked style="width:auto"> Guardarlo para buscarlo fácil la próxima vez</label><button class="btn" onclick="customAdd('${meal}')">Agregar</button><button class="btn alt" onclick="openAdd('${meal}')">Volver</button>`}
+function customAdd(meal){
+  let n=document.getElementById("cn").value.trim();if(!n)return;
+  const item={name:n,portion:document.getElementById("cp").value||"1 porción",k:+document.getElementById("ck").value||0,p:+document.getElementById("cpr").value||0,c:+document.getElementById("cc").value||0,f:+document.getElementById("cf").value||0,meal};
+  if(document.getElementById("saveForNextTime")?.checked){
+    if(!customFoods.some(x=>x[0].toLowerCase()===n.toLowerCase())){
+      customFoods.push([item.name,item.portion,item.k,item.p,item.c,item.f]);
+      saveCustomFoods();
+    }
+  }
+  addItem(item);
+}
+function removeFood(i,m){let arr=items();let idx=arr.findIndex((x,j)=>x.meal===m && [...arr.slice(0,j)].filter(y=>y.meal===m).length===i);if(idx>=0){arr.splice(idx,1);log[key()]=arr;save();showHome()}}
+function close(){document.getElementById("overlay").style.display="none"}
+function closeProfile(){
+  close();
+  if(history.state?.view==='profile') history.back();
+  else updateBackButton('home');
+}
+document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")close()});
+document.getElementById("scannerOverlay").addEventListener("click",e=>{if(e.target.id==="scannerOverlay")closeScanner()})
+function openProfile(fromHistory=false){if(!profile){openOnboarding();return}if(!fromHistory)syncHistory('profile');document.getElementById("sheet").innerHTML=`<div class="profilehero"><div class="profilehead"><img class="profilebroc-img" src="assets/broccoli.png" alt="Mascota Nutri"><div><h2 style="margin:0">Mi perfil</h2><div class="muted" style="font-size:12px">${profile.name?`Hola, ${esc(profile.name)} 👋`:""}</div><div class="muted">${profile.age} años · ${profile.height} cm · ${profile.weight} kg</div></div></div><button type="button" class="sheetclose" onclick="closeProfile()" aria-label="Cerrar perfil">×</button></div><div class="metric" style="margin-top:15px"><div class="cardmini"><span class="muted">IMC</span><b>${profile.bmi}</b><small>${esc(bmiLabel(profile.bmi))}</small></div><div class="cardmini"><span class="muted">Meta</span><b>${profile.goal} kcal</b><small>${goalLabel(profile.goaltype)}</small></div><div class="cardmini"><span class="muted">Actividad</span><b>${ACT.find(a=>a[0]===profile.activity)?.[1]||''}</b><small>${profile.days} días/semana</small></div><div class="cardmini"><span class="muted">Entrenamiento</span><b>${esc(profile.training)}</b></div></div><div class="goalbox"><b>Datos usados para el cálculo</b><div class="summaryline"><span>Metabolismo basal estimado</span><b>${profile.bmr} kcal</b></div><div class="summaryline"><span>Gasto diario estimado</span><b>${profile.tdee} kcal</b></div><div class="summaryline"><span>Objetivo nutricional</span><b>${profile.goal} kcal</b></div></div><div class="customgoal"><b>Meta de calorías</b><div class="hint">Nutri propone una estimación automática. Si un nutriólogo, médico o entrenador te indicó otra cifra, puedes personalizarla aquí.</div><div class="row"><div class="field" style="margin:10px 0 0"><label>Calorías diarias</label><input id="customGoalInput" type="number" min="800" max="10000" step="10" value="${profile.goal}"></div><button class="btn" style="margin:10px 0 0" onclick="saveCustomGoal()">Guardar meta</button></div><button class="btn alt" style="margin-top:8px" onclick="restoreEstimatedGoal()">Usar estimación de Nutri (${profile.goalEstimated} kcal)</button><div class="hint">${profile.goalCustom?'✓ Meta personalizada activa.':'• Estás usando la estimación automática de Nutri.'}</div></div><div class="goalbox"><b>Historial de peso</b>${progress.length?progress.slice(-6).reverse().map(x=>`<div class="summaryline"><span>${new Date(x.date+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'})}</span><b>${x.weight} kg</b></div>`).join(''):'<div class="muted" style="margin-top:8px">Todavía no hay registros de peso.</div>'}</div><div class="sharegrid"><button class="sharebtn" onclick="shareToday()">🔥 Compartir hoy</button><button class="sharebtn" onclick="shareMonth()">📅 Compartir mes</button></div><button class="btn" onclick="closeProfile();openOnboarding()">Editar mis datos</button><div class="note">Los resultados son estimaciones. El gasto energético real puede variar. El IMC es una medida de cribado, no un diagnóstico.</div><button class="btn alt" style="margin-top:14px;color:#a33a3a" onclick="if(confirm('¿Cerrar sesión?'))logoutAccount()">Cerrar sesión</button>`;document.getElementById("overlay").style.display="flex"}
+/* =========================================================
+   ASISTENTE CON IA: recetas, plan semanal, rutina, progreso
+   ========================================================= */
+function aiLoadingHtml(msg){return `<div class="calc-loading"><div class="green-spinner"></div><b>${esc(msg)}</b><p class="muted" style="margin-top:6px">Esto puede tardar unos segundos.</p></div>`}
+function aiErrorHtml(msg){return `<div class="analysis-card"><b>No se pudo generar</b><p class="muted" style="font-size:12px;line-height:1.4">${esc(msg||'Intenta de nuevo en un momento.')}</p></div>`}
+
+// ---------- Recetas ----------
+function openAIRecipe(){
+  document.getElementById('sheet').innerHTML=`<div class="profilehero"><div class="profilehead"><h2 style="margin:0">🍳 Receta con IA</h2></div><button type="button" class="sheetclose" onclick="closeProfile()">×</button></div><p class="muted" style="font-size:13px">Dile a Nutri qué ingredientes tienes y te arma una receta con su información nutricional.</p><div class="field"><label>Ingredientes disponibles</label><textarea id="aiRecIngredientes" rows="2" placeholder="Ej. pechuga de pollo, arroz, brócoli, ajo"></textarea></div><div class="field"><label>Restricciones o alergias (opcional)</label><input id="aiRecRestricciones" placeholder="Ej. sin lactosa, sin picante"></div><button class="btn" id="aiRecBtn" onclick="generateAIRecipeNow()">Generar receta</button><div id="aiRecResult" style="margin-top:14px"></div>`;
+  document.getElementById('overlay').style.display='flex';
+}
+async function generateAIRecipeNow(){
+  const ing=document.getElementById('aiRecIngredientes').value.trim();
+  if(!ing){alert('Escribe al menos un ingrediente.');return}
+  const restricciones=document.getElementById('aiRecRestricciones').value.trim();
+  const btn=document.getElementById('aiRecBtn'), out=document.getElementById('aiRecResult');
+  btn.disabled=true;out.innerHTML=aiLoadingHtml('Pensando en una receta…');
+  try{
+    const resp=await fetch('/api/generate-recipe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ingredientes:ing,restricciones,objetivo:goalLabel(profile?.goaltype),perfil:profile})});
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const r=await resp.json();
+    out.innerHTML=`<div class="analysis-card"><h3 style="margin:0 0 4px">${esc(r.nombre)}</h3><p class="muted" style="font-size:13px">${esc(r.descripcion||'')}</p><div class="editable-grid" style="margin-top:10px"><div class="macro"><b>${r.kcal_porcion||0}</b><span>kcal/porción</span></div><div class="macro"><b>${r.proteina_porcion||0}g</b><span>Proteína</span></div><div class="macro"><b>${r.carbohidratos_porcion||0}g</b><span>Carbs</span></div><div class="macro"><b>${r.grasas_porcion||0}g</b><span>Grasas</span></div></div><div class="muted" style="font-size:12px;margin-top:8px">${r.porciones||2} porciones · ${r.tiempo_min||'?'} min</div><b style="display:block;margin-top:12px">Ingredientes</b><ul style="margin:6px 0;padding-left:18px">${(r.ingredientes||[]).map(i=>`<li>${esc(i.cantidad)} ${esc(i.nombre)}</li>`).join('')}</ul><b style="display:block;margin-top:10px">Preparación</b><ol style="margin:6px 0;padding-left:18px">${(r.pasos||[]).map(p=>`<li style="margin-bottom:4px">${esc(p)}</li>`).join('')}</ol>${r.tip?`<div class="info" style="margin-top:10px">💡 ${esc(r.tip)}</div>`:''}</div>`;
+    saveAIRecipe(r);
+  }catch(e){console.error(e);out.innerHTML=aiErrorHtml('No se pudo generar la receta. Revisa tu conexión e intenta de nuevo.')}
+  finally{btn.disabled=false}
+}
+
+// ---------- Plan de alimentación semanal ----------
+function openAIMealPlan(){
+  if(!profile){alert('Primero completa tu perfil.');return}
+  document.getElementById('sheet').innerHTML=`<div class="profilehero"><div class="profilehead"><h2 style="margin:0">🗓️ Plan semanal con IA</h2></div><button type="button" class="sheetclose" onclick="closeProfile()">×</button></div><p class="muted" style="font-size:13px">Un menú ajustado a tu meta de ${profile.goal} kcal diarias.</p><div class="field"><label>¿Cuántos días?</label><select id="aiPlanDias"><option value="3">3 días</option><option value="7" selected>7 días</option></select></div><div class="field"><label>Preferencias (opcional)</label><input id="aiPlanPref" placeholder="Ej. vegetariano, no picante, sin mariscos"></div><button class="btn" id="aiPlanBtn" onclick="generateAIMealPlanNow()">Generar plan</button><div id="aiPlanResult" style="margin-top:14px"></div>`;
+  document.getElementById('overlay').style.display='flex';
+}
+async function generateAIMealPlanNow(){
+  const dias=document.getElementById('aiPlanDias').value;
+  const preferencias=document.getElementById('aiPlanPref').value.trim();
+  const btn=document.getElementById('aiPlanBtn'), out=document.getElementById('aiPlanResult');
+  btn.disabled=true;out.innerHTML=aiLoadingHtml('Armando tu plan de la semana…');
+  try{
+    const resp=await fetch('/api/generate-meal-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({perfil:profile,dias,preferencias})});
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const r=await resp.json();
+    out.innerHTML=(r.dias||[]).map(d=>`<div class="analysis-card"><b>${esc(d.dia)}</b> <span class="muted" style="font-size:12px">· ${d.total_kcal||0} kcal</span>${(d.comidas||[]).map(c=>`<div class="summaryline"><span>${esc(c.tipo)}: ${esc(c.nombre)}</span><b>${c.kcal||0} kcal</b></div>`).join('')}</div>`).join('')+(r.lista_compras?.length?`<div class="analysis-card"><b>🛒 Lista de compras</b><div class="muted" style="font-size:13px;margin-top:6px">${r.lista_compras.map(esc).join(' · ')}</div></div>`:'');
+    saveAIMealPlan(r);
+  }catch(e){console.error(e);out.innerHTML=aiErrorHtml('No se pudo generar el plan. Revisa tu conexión e intenta de nuevo.')}
+  finally{btn.disabled=false}
+}
+
+// ---------- Rutina de ejercicio con IA ----------
+function openAIRoutine(){
+  document.getElementById('sheet').innerHTML=`<div class="profilehero"><div class="profilehead"><h2 style="margin:0">💪 Rutina con IA</h2></div><button type="button" class="sheetclose" onclick="closeProfile()">×</button></div><div class="field"><label>Días de entrenamiento por semana</label><select id="aiRutDias">${[2,3,4,5,6].map(n=>`<option value="${n}" ${n===3?'selected':''}>${n} días</option>`).join('')}</select></div><div class="field"><label>Equipo disponible</label><select id="aiRutEquipo"><option>Gimnasio completo</option><option>Mancuernas en casa</option><option selected>Solo peso corporal</option></select></div><div class="field"><label>Nivel</label><select id="aiRutNivel"><option>Principiante</option><option>Intermedio</option><option>Avanzado</option></select></div><button class="btn" id="aiRutBtn" onclick="generateAIRoutineNow()">Generar rutina</button><div id="aiRutResult" style="margin-top:14px"></div>`;
+  document.getElementById('overlay').style.display='flex';
+}
+async function generateAIRoutineNow(){
+  const diasPorSemana=document.getElementById('aiRutDias').value;
+  const equipo=document.getElementById('aiRutEquipo').value;
+  const nivel=document.getElementById('aiRutNivel').value;
+  const btn=document.getElementById('aiRutBtn'), out=document.getElementById('aiRutResult');
+  btn.disabled=true;out.innerHTML=aiLoadingHtml('Diseñando tu rutina…');
+  try{
+    const resp=await fetch('/api/generate-routine',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({perfil:profile,diasPorSemana,equipo,nivel})});
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const r=await resp.json();
+    saveAIRoutineData(r);
+    const routineId=aiRoutines[0].id;
+    out.innerHTML=(r.dias||[]).map((d,i)=>`<div class="analysis-card"><div class="historytitle"><b>${esc(d.dia)} · ${esc(d.enfoque||'')}</b><button class="smallbtn" onclick="useAIRoutineDay('${routineId}',${i})">Usar hoy</button></div>${(d.ejercicios||[]).map(e=>`<div class="summaryline"><span>${esc(e.nombre)}</span><b>${e.series||'-'}x${esc(String(e.repeticiones||'-'))}</b></div>`).join('')}</div>`).join('')+(r.recomendacion_general?`<div class="info">💡 ${esc(r.recomendacion_general)}</div>`:'');
+  }catch(e){console.error(e);out.innerHTML=aiErrorHtml('No se pudo generar la rutina. Revisa tu conexión e intenta de nuevo.')}
+  finally{btn.disabled=false}
+}
+function useAIRoutineDay(routineId,dayIndex){
+  const r=aiRoutines.find(x=>x.id===routineId); const day=r?.dias?.[dayIndex]; if(!day)return;
+  routine=(day.ejercicios||[]).map(e=>`${e.nombre} (${e.series||'-'}x${e.repeticiones||'-'})`);
+  saveExercise();
+  closeProfile();
+  showExercise();
+}
+
+// ---------- Análisis de progreso con IA ----------
+function openAIProgress(){
+  document.getElementById('sheet').innerHTML=`<div class="profilehero"><div class="profilehead"><h2 style="margin:0">📊 Analizar mi progreso</h2></div><button type="button" class="sheetclose" onclick="closeProfile()">×</button></div><p class="muted" style="font-size:13px">La IA revisa tu peso e historial de calorías y te da una retroalimentación breve.</p><button class="btn" id="aiProgBtn" onclick="generateAIProgressNow()">Analizar ahora</button><div id="aiProgResult" style="margin-top:14px"></div>`;
+  document.getElementById('overlay').style.display='flex';
+}
+async function generateAIProgressNow(){
+  const btn=document.getElementById('aiProgBtn'), out=document.getElementById('aiProgResult');
+  const resumenCalorias=Object.keys(log).sort().slice(-14).map(d=>({date:d,kcal:Math.round(totals(log[d]).k)}));
+  if(!progress.length && !resumenCalorias.length){out.innerHTML=aiErrorHtml('Todavía no hay suficiente historial registrado. Registra algunos días y vuelve a intentarlo.');return}
+  btn.disabled=true;out.innerHTML=aiLoadingHtml('Revisando tu historial…');
+  try{
+    const resp=await fetch('/api/analyze-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({perfil:profile,progreso:progress,resumenCalorias})});
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const r=await resp.json();
+    out.innerHTML=`<div class="analysis-card"><b>Tendencia</b><p style="margin:6px 0">${esc(r.tendencia||'')}</p></div><div class="analysis-card"><b>Observaciones</b><ul style="margin:6px 0;padding-left:18px">${(r.observaciones||[]).map(o=>`<li style="margin-bottom:4px">${esc(o)}</li>`).join('')}</ul></div><div class="analysis-card"><b>Recomendaciones</b><ul style="margin:6px 0;padding-left:18px">${(r.recomendaciones||[]).map(o=>`<li style="margin-bottom:4px">${esc(o)}</li>`).join('')}</ul></div>${r.nota?`<div class="note">${esc(r.nota)}</div>`:''}`;
+  }catch(e){console.error(e);out.innerHTML=aiErrorHtml('No se pudo analizar tu progreso. Revisa tu conexión e intenta de nuevo.')}
+  finally{btn.disabled=false}
+}
+
+initActivity();
+if(!history.state?.view) history.replaceState({view:'home'},'',location.href);
+updateBackButton(history.state.view);
+window.addEventListener('popstate', e=>{
+  const view=e.state?.view||'home';
+  if(view==='calendar') showCalendar(true);
+  else if(view==='profile') openProfile(true);
+  else if(view==='exercise') showExercise(true);
+  else { close(); showHome(true); }
+});
+// Ocultar la barra inferior al deslizar hacia abajo y mostrarla al deslizar hacia arriba.
+let lastScrollY=window.scrollY||0;
+window.addEventListener('scroll',()=>{
+  const nav=document.querySelector('.bottom');
+  const y=window.scrollY||0;
+  if(y>lastScrollY+6 && y>80) nav.classList.add('hide-on-scroll');
+  else if(y<lastScrollY-6) nav.classList.remove('hide-on-scroll');
+  lastScrollY=y;
+},{passive:true});
+const splash=document.getElementById("splash");
+// Arranque persistente: si ya existe un perfil válido, una actualización nunca debe pedir los datos otra vez.
+bootAuth();
+setTimeout(()=>{if(document.getElementById("authOverlay").style.display!=="block") splash.classList.add("hide")},1100);
+setTimeout(()=>splash.remove(),1500);
+// Registramos el service worker para que la app sea instalable y funcione offline.
+// sw.js siempre pide index.html a la red primero (no de caché), así que el teléfono
+// nunca se queda pegado con una versión vieja: ver comentario en sw.js.
+if("serviceWorker" in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('No se pudo registrar el service worker',e));
+  });
+}
+</script>
+</body>
+</html>
