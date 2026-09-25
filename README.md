@@ -1,5 +1,7 @@
 # Nutri — app de nutrición y fitness con IA
 
+**App publicada:** https://nutri-app-sage-sigma.vercel.app
+
 ## Qué cambió respecto a la versión anterior
 - **Cuentas y datos en la nube (Supabase)**: antes todo vivía en el navegador del teléfono
   (`localStorage`), lo que causaba que los datos "se perdieran" o la sesión se reiniciara.
