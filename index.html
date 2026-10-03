@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3f5f4">
-<meta name="nutri-version" content="29">
+<meta name="nutri-version" content="30">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -847,6 +847,7 @@ const key=()=>dateKey(new Date());
 // internet, la app siga mostrando lo último conocido en vez de quedar en blanco.
 function save(){
   if(!currentAccount)return;
+  if(!window.__repairing){window.__repairing=1;try{checkStreakRepair()}finally{window.__repairing=0}}
   try{localStorage.setItem('nutri_cache_'+currentAccount,JSON.stringify({profile,log,progress}))}catch(e){}
   sb.from('user_data').update({profile,log,progress}).eq('user_id',currentAccount).then(({error})=>{if(error)console.error('No se pudo guardar en la nube (se reintentará en el próximo cambio)',error)});
 }
@@ -882,7 +883,13 @@ function items(k=selectedDate||key()){return log[k]||[]}
 function totals(arr=items()){return arr.reduce((a,x)=>{a.k+=+x.k||0;a.p+=+x.p||0;a.c+=+x.c||0;a.f+=+x.f||0;return a},{k:0,p:0,c:0,f:0})}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function setNav(active){document.querySelectorAll('.bottom button').forEach(b=>b.classList.remove('active'));document.getElementById(active)?.classList.add('active')}
-function getStreak(){let d=new Date(),n=0;while(true){let k=dateKey(d);if(!(log[k]&&log[k].length))break;n++;d.setDate(d.getDate()-1)}return n}
+// Un día cuenta si registraste comida o si lo recuperaste (profile.streakRepairs).
+function dayCounts(k){return !!(log[k]&&log[k].length)||!!(profile&&(profile.streakRepairs||[]).includes(k))}
+function getStreak(){let d=new Date(),n=0;if(!dayCounts(dateKey(d)))d.setDate(d.getDate()-1);while(dayCounts(dateKey(d))){n++;d.setDate(d.getDate()-1)}return n}
+// Recuperar racha: si se te pasó ayer (y traías 2+ días), registra 3 comidas hoy y se recupera.
+function streakRepairInfo(){const t=new Date();const y=new Date(t);y.setDate(y.getDate()-1);const yk=dateKey(y);if(dayCounts(yk))return null;let d=new Date(y);d.setDate(d.getDate()-1);let prev=0;while(dayCounts(dateKey(d))){prev++;d.setDate(d.getDate()-1)}if(prev<2)return null;return {yk,prev,have:(log[dateKey(t)]||[]).length,need:3}}
+function checkStreakRepair(){const r=streakRepairInfo();if(!r||r.have<r.need)return;profile.streakRepairs=[...(profile.streakRepairs||[]).slice(-30),r.yk];save();setTimeout(()=>{nutriToast('¡Racha recuperada! '+getStreak()+' días');try{sfx('celebrate')}catch(e){}},400)}
+function streakRepairBanner(){const r=streakRepairInfo();if(!r)return '';return `<div class="card" style="border:1.5px solid #f59e0b"><b>Recupera tu racha de ${r.prev} días</b><div class="muted small" style="margin-top:4px">Se te pasó registrar ayer. Registra 3 comidas hoy (llevas ${r.have}) y tu racha regresa completa.</div></div>`}
 function mascotText(streak){if(streak===0)return "Empieza hoy";if(streak===1)return "¡Primer día registrado!";if(streak<7)return "¡Vas con todo!";if(streak<14)return "¡Ya traes una gran racha!";if(streak<30)return "¡Tu brócoli está orgulloso!";return "¡Racha legendaria!"}
 function isStreakMilestone(n){return n===1||n===3||n===7||(n>=15&&n%15===0)}
 function maybeCelebrateStreak(){
@@ -1486,7 +1493,7 @@ function showHome(fromHistory=false){
   const latest=progress.length?progress[progress.length-1]:null;
   html+=`<div class="section-title">Progreso</div><section class="card progress-card"><div class="grow"><div class="muted small">Peso actual</div><div class="big-mid">${latest?latest.weight+' kg':'—'}</div><div class="muted small">${Object.values(log).filter(a=>a&&a.length).length} días registrados</div></div><div class="spark-wrap">${weightSpark()}</div></section>
   <div class="two-btn"><button class="btn alt" onclick="openWeightLog()">${ic('scale',18)} Registrar peso</button><button class="btn alt" onclick="openAIProgress()">${ic('chart',18)} Analizar</button></div>`;
-  document.getElementById("home").innerHTML=html;
+  document.getElementById("home").innerHTML=streakRepairBanner()+html;
 }
 function openWeightLog(){
   const last=progress.length?progress[progress.length-1].weight:profile?.weight||'';
