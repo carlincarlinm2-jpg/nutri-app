@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3f5f4">
-<meta name="nutri-version" content="28">
+<meta name="nutri-version" content="29">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -535,6 +535,7 @@ html[data-time="night"] .mascot-svg .ms-zzz{fill:#a5b4fc}
 <div class="streak-overlay" id="exerciseCelebration" aria-hidden="true"><div class="streak-modal" id="exerciseCelebrationModal"><div id="exerciseSparks"></div><div class="js-mascot" data-size="110" data-mood="celebrate"></div><h2>¡Felicidades!</h2><p class="muted">Terminaste tu rutina de hoy. ¿Hiciste algo más que quieras agregar?</p><button type="button" class="btn" onclick="closeExerciseCelebration();openRoutineEditor()">+ Agregar algo que hice hoy</button><button type="button" class="btn alt" style="margin-top:8px" onclick="closeExerciseCelebration()">Ya terminé, gracias</button></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="sounds.js" data-app="nutri"></script>
 <script>
 // ====== CONFIGURACIÓN ======
 // Estos dos valores no son secretos: se usan del lado del navegador a propósito.
@@ -1547,23 +1548,6 @@ function openMyFoods(){
   openSheet(sheetHead('Mis alimentos',customFoods.length+' guardados')+(customFoods.length?`<div class="res-group">${customFoods.map((x,i)=>`<div class="row-item"><div class="row-main"><div class="row-title">${esc(x[0])}</div><div class="row-sub">${esc(x[1])} · ${fmtNum(x[2])} kcal · P ${x[3]} · C ${x[4]} · G ${x[5]}</div></div><button class="icon-btn" onclick="deleteCustomFood(${i})" aria-label="Borrar">${ic('trash',17)}</button></div>`).join('')}</div>`:'<div class="empty-row">Aún no tienes alimentos guardados. Cuando crees uno o elijas un producto de marca, aparecerá aquí.</div>')+`<button class="btn" onclick="openCustom(mealByTime())">${ic('plus',18)} Crear alimento</button>`);
 }
 function deleteCustomFood(i){if(!confirm('¿Borrar '+customFoods[i][0]+' de Mis alimentos?'))return;customFoods.splice(i,1);saveCustomFoods();openMyFoods()}
-
-/* ====================== Sonidos (generados, sin archivos) ====================== */
-let __actx=null;
-function soundOn(){try{return localStorage.getItem('nutri_sound')!=='off'}catch(e){return true}}
-function setSound(on){try{localStorage.setItem('nutri_sound',on?'on':'off')}catch(e){}if(on)sfx('ok')}
-function __ac(){if(!__actx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;__actx=new C()}if(__actx.state==='suspended')__actx.resume();return __actx}
-function __tone(f,d,{type='sine',vol=.07,at=0,slide=null}={}){const c=__ac();if(!c)return;const t=c.currentTime+at,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(c.destination);o.start(t);o.stop(t+d+.02)}
-const SFX={
-  tap(){__tone(1150,.05,{vol:.035,type:'triangle'})},
-  open(){__tone(520,.12,{vol:.045,slide:820})},
-  toggle(){__tone(900,.05,{vol:.04,type:'square'});__tone(1300,.05,{vol:.03,type:'square',at:.05})},
-  ok(){__tone(880,.12,{vol:.06});__tone(1320,.18,{vol:.06,at:.09})},
-  undo(){__tone(700,.1,{vol:.045,slide:420})},
-  celebrate(){[523,659,784,1047].forEach((f,i)=>__tone(f,.22,{vol:.06,type:'triangle',at:i*.09}));__tone(2093,.5,{vol:.03,at:.36})},
-};
-function sfx(n){if(soundOn())try{SFX[n]&&SFX[n]()}catch(e){}}
-document.addEventListener('pointerdown',e=>{const b=e.target.closest('button,.row,.quit,[onclick]');if(!b||b.dataset.nosfx!=null)return;sfx('tap')},{passive:true});
 
 // Nombre compartido entre apps (Nutri, Ritmo y North usan la misma cuenta).
 async function syncAccountName(force){

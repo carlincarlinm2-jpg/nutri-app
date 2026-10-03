@@ -5,7 +5,7 @@
 // Los archivos estáticos (íconos, manifest) sí se cachean para que la app abra rápido
 // y funcione aunque no haya internet en ese instante (aunque sin poder sincronizar datos).
 
-const CACHE_NAME = 'nutri-static-v7';
+const CACHE_NAME = 'nutri-static-v8';
 const STATIC_ASSETS = [
   './manifest.json',
   './icons/icon-192.png',
@@ -38,9 +38,9 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Navegación / index.html: red primero, caché solo como respaldo sin conexión.
-  if (event.request.mode === 'navigate' || url.pathname.endsWith('index.html') || url.pathname === '/') {
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('index.html') || url.pathname === '/' || url.pathname.endsWith('.js')) {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('./index.html'))
+      fetch(event.request).catch(() => caches.match(event.request).then((h) => h || caches.match('./index.html')))
     );
     return;
   }
