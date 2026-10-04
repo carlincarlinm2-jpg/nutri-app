@@ -38,8 +38,19 @@ module.exports = async (req, res) => {
     const { messages = [], scenario = '', level = 'A1', unit = '', mode = 'chat' } = req.body || {};
     const clean = messages.filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string').slice(-12)
       .map((m) => ({ role: m.role, content: m.content.slice(0, 800) }));
-    if (mode !== 'summary' && (!clean.length || clean[clean.length - 1].role !== 'user')) { res.status(400).json({ error: 'Escribe o di algo para empezar.' }); return; }
+    if (mode === 'chat' && (!clean.length || clean[clean.length - 1].role !== 'user')) { res.status(400).json({ error: 'Escribe o di algo para empezar.' }); return; }
 
+    if (mode === 'grade') {
+      const { task = {}, answer = '', kind = 'writing' } = req.body || {};
+      const sys3 = `You are a certified Cambridge English examiner. Grade a ${kind} answer from a Spanish-speaking learner (expected level ${level}) using Cambridge-style criteria (content/task completion, organisation, language range, accuracy${kind === 'speaking' ? ', fluency (the text is a speech-recognition transcript, so ignore punctuation and capitalization)' : ''}). Be fair and encouraging but honest. Respond ONLY with valid JSON, no backticks:
+{"score":0-100,"cefr":"A1|A2|B1|B2|C1","feedback_es":"2-3 sentences in Mexican Spanish","criteria":[{"name_es":"Contenido","score":0-5},{"name_es":"Organización","score":0-5},{"name_es":"Vocabulario","score":0-5},{"name_es":"Gramática","score":0-5}],"corrections":[{"said":"exact fragment","better":"corrected","why_es":"short reason"}],"improved":"an improved version of the learner's answer at the target level"}
+Up to 6 corrections. If the answer is empty, off-topic or not in English, score below 20.`;
+      const userMsg = `TASK: ${String(task.prompt_en || '').slice(0, 900)}\nREQUIRED POINTS: ${(task.checklist || []).join(' | ').slice(0, 600)}\nWORD RANGE: ${task.min || ''}-${task.max || ''}\n\nLEARNER ANSWER:\n${String(answer).slice(0, 2500)}`;
+      const t3 = await callClaude({ tier: 'haiku', maxTokens: 1200, system: sys3, messages: [{ role: 'user', content: userMsg }] });
+      let d3; try { d3 = extractJSON(t3); } catch (e) { d3 = { score: null, feedback_es: 'No pude calificar esta respuesta.', corrections: [], criteria: [] }; }
+      await fetch(`${SUPABASE_URL}/rest/v1/en_tutor_usage`, { method: 'POST', headers: { ...sbHeaders(token), Prefer: 'return=minimal' }, body: JSON.stringify({ user_id: user.id, day }) }).catch(() => {});
+      res.status(200).json(d3); return;
+    }
     if (mode === 'summary') {
       const convo = clean.map((m) => (m.role === 'user' ? 'LEARNER: ' : 'TUTOR: ') + m.content).join('\n');
       const sys2 = `You are an expert English teacher for Spanish speakers from Mexico (learner level ${level}). Analyze ONLY the learner's messages in the conversation and give feedback. Respond ONLY with valid JSON, no backticks:
