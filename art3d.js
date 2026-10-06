@@ -49,7 +49,7 @@
   }
   var pending = new Set(), sched = false;
   function flush() { sched = false; pending.forEach(function (n) { if (n.isConnected) walk(n); }); pending.clear(); }
-  function queue(n) { pending.add(n); if (!sched) { sched = true; requestAnimationFrame(flush); } }
+  function queue(n) { pending.add(n); if (!sched) { sched = true; setTimeout(flush, 0); } }
   function start() {
     walk(document.body);
     new MutationObserver(function (ms) { ms.forEach(function (m) { if (m.type === 'characterData') queue(m.target); else m.addedNodes.forEach(queue); }); })
