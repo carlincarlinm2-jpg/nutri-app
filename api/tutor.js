@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
     const day = mxDay();
     const c = await fetch(`${SUPABASE_URL}/rest/v1/en_tutor_usage?select=id&day=eq.${day}`, { headers: { ...sbHeaders(token), Prefer: 'count=exact', Range: '0-0' } });
     const used = Number((c.headers.get('content-range') || '*/0').split('/')[1]) || 0;
-    if (used >= DAILY_LIMIT) { res.status(429).json({ error: `Por hoy ya platicaste ${DAILY_LIMIT} veces con Kiko. Mañana seguimos.` , used, limit: DAILY_LIMIT }); return; }
+    if (used >= DAILY_LIMIT) { res.status(429).json({ error: `Por hoy ya platicaste ${DAILY_LIMIT} veces con Alex. Mañana seguimos.` , used, limit: DAILY_LIMIT }); return; }
 
     const { messages = [], scenario = '', level = 'A1', unit = '', mode = 'chat' } = req.body || {};
     const clean = messages.filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string').slice(-12)
@@ -61,7 +61,7 @@ Include up to 8 mistakes (most important first), 2-3 strengths, 3 tips and 4 use
       await fetch(`${SUPABASE_URL}/rest/v1/en_tutor_usage`, { method: 'POST', headers: { ...sbHeaders(token), Prefer: 'return=minimal' }, body: JSON.stringify({ user_id: user.id, day }) }).catch(() => {});
       res.status(200).json(d2); return;
     }
-    const system = `You are Kiko, a friendly, upbeat English conversation tutor (a cool parrot with sunglasses) inside an app for Spanish speakers from Mexico.
+    const system = `You are Alex, a friendly, upbeat English conversation tutor (a cheerful little blue bird with a red scarf) inside an app for Spanish speakers from Mexico.
 The learner's level is ${level} (CEFR). ${unit ? `They are studying: ${unit}.` : ''} ${scenario ? `Role-play scenario: ${scenario}. Stay in character for the scenario.` : 'Have a natural, friendly conversation about everyday life.'}
 Rules:
 - Reply in English adapted to the learner's level: A1–A2 use very short, simple sentences (max 2 sentences, common words); B1–B2 can use 2–3 natural sentences.
