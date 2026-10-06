@@ -5,7 +5,7 @@
 // Los archivos estáticos (íconos, manifest) sí se cachean para que la app abra rápido
 // y funcione aunque no haya internet en ese instante (aunque sin poder sincronizar datos).
 
-const CACHE_NAME = 'nutri-static-v11';
+const CACHE_NAME = 'nutri-static-v12';
 const STATIC_ASSETS = [
   './manifest.json',
   './icons/icon-192.png',
@@ -30,6 +30,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (new URL(event.request.url).searchParams.has('check')) return; // revisión de versión nueva: siempre a la red
   const url = new URL(event.request.url);
 
   // Nunca cachear llamadas a la API (IA, datos en vivo) ni a Supabase.
